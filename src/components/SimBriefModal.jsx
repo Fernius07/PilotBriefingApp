@@ -1,5 +1,6 @@
 import React, { useState } from 'react';
 import { Database, X, ArrowRight, Download, Check, AlertCircle, RefreshCw, Plane } from 'lucide-react';
+import { secureFetch } from '../utils/apiClient';
 
 export default function SimBriefModal({ isOpen, onClose, onImportPlan }) {
   const [username, setUsername] = useState('');
@@ -18,16 +19,16 @@ export default function SimBriefModal({ isOpen, onClose, onImportPlan }) {
     setFetchedPlan(null);
 
     try {
-      const res = await fetch(`/api/simbrief/${encodeURIComponent(username.trim())}`);
+      const res = await secureFetch(`/api/simbrief/${encodeURIComponent(username.trim())}`);
       const data = await res.json();
 
       if (!res.ok) {
-        throw new Error(data.error || 'Error al obtener plan de vuelo de SimBrief');
+        throw new Error(data.error || 'Failed to retrieve SimBrief flight plan');
       }
 
       setFetchedPlan(data);
     } catch (err) {
-      setError(err.message || 'No se pudo conectar con la API de SimBrief');
+      setError(err.message || 'Could not connect to SimBrief API');
     } finally {
       setLoading(false);
     }
@@ -51,8 +52,8 @@ export default function SimBriefModal({ isOpen, onClose, onImportPlan }) {
               <Database className="w-4 h-4" />
             </div>
             <div>
-              <h3 className="font-mono font-bold text-base text-white">IMPORTAR OFP DE SIMBRIEF</h3>
-              <p className="text-xs text-slate-400 font-mono">Carga tu último plan de vuelo generado</p>
+              <h3 className="font-mono font-bold text-base text-white">IMPORT SIMBRIEF OFP</h3>
+              <p className="text-xs text-slate-400 font-mono">Load your latest generated operational flight plan</p>
             </div>
           </div>
           <button
@@ -67,14 +68,14 @@ export default function SimBriefModal({ isOpen, onClose, onImportPlan }) {
         <form onSubmit={handleFetch} className="space-y-3">
           <div>
             <label className="block text-xs font-mono text-slate-300 mb-1.5 uppercase tracking-wider">
-              Nombre de usuario o Pilot ID de SimBrief:
+              SimBrief Username or Pilot ID:
             </label>
             <div className="flex gap-2">
               <input
                 type="text"
                 value={username}
                 onChange={(e) => setUsername(e.target.value)}
-                placeholder="ej. TuUsuario o 123456"
+                placeholder="e.g. YourUsername or 123456"
                 className="flex-1 px-3 py-2 bg-cockpit-950 border border-cockpit-border rounded-lg text-sm font-mono text-white placeholder-slate-500 focus:outline-none focus:border-cockpit-cyan"
               />
               <button
@@ -83,7 +84,7 @@ export default function SimBriefModal({ isOpen, onClose, onImportPlan }) {
                 className="px-4 py-2 bg-amber-500/20 hover:bg-amber-500 text-amber-300 hover:text-black border border-amber-500/40 rounded-lg text-xs font-mono font-bold transition-all flex items-center gap-2 disabled:opacity-50"
               >
                 {loading && <RefreshCw className="w-3.5 h-3.5 animate-spin" />}
-                <span>BUSCAR OFP</span>
+                <span>FETCH OFP</span>
               </button>
             </div>
           </div>
@@ -117,7 +118,7 @@ export default function SimBriefModal({ isOpen, onClose, onImportPlan }) {
             {/* Origin -> Dest -> Alternate badges */}
             <div className="flex items-center justify-between gap-2 text-xs font-mono">
               <div className="p-2 rounded bg-cockpit-900 border border-cockpit-border flex-1 text-center">
-                <div className="text-[10px] text-slate-500 uppercase">ORIGEN</div>
+                <div className="text-[10px] text-slate-500 uppercase">ORIGIN</div>
                 <div className="text-sm font-bold text-cockpit-cyan">{fetchedPlan.origin?.icao}</div>
                 <div className="text-[10px] text-slate-400">RWY {fetchedPlan.origin?.planRwy || '--'}</div>
               </div>
@@ -125,7 +126,7 @@ export default function SimBriefModal({ isOpen, onClose, onImportPlan }) {
               <ArrowRight className="w-4 h-4 text-slate-500 flex-shrink-0" />
 
               <div className="p-2 rounded bg-cockpit-900 border border-cockpit-border flex-1 text-center">
-                <div className="text-[10px] text-slate-500 uppercase">DESTINO</div>
+                <div className="text-[10px] text-slate-500 uppercase">DESTINATION</div>
                 <div className="text-sm font-bold text-amber-400">{fetchedPlan.destination?.icao}</div>
                 <div className="text-[10px] text-slate-400">RWY {fetchedPlan.destination?.planRwy || '--'}</div>
               </div>
@@ -134,7 +135,7 @@ export default function SimBriefModal({ isOpen, onClose, onImportPlan }) {
                 <>
                   <ArrowRight className="w-4 h-4 text-slate-500 flex-shrink-0" />
                   <div className="p-2 rounded bg-cockpit-900 border border-cockpit-border flex-1 text-center">
-                    <div className="text-[10px] text-slate-500 uppercase">ALTERNATIVO</div>
+                    <div className="text-[10px] text-slate-500 uppercase">ALTERNATE</div>
                     <div className="text-sm font-bold text-purple-400">{fetchedPlan.alternate?.icao}</div>
                     <div className="text-[10px] text-slate-400">RWY {fetchedPlan.alternate?.planRwy || '--'}</div>
                   </div>
@@ -145,14 +146,14 @@ export default function SimBriefModal({ isOpen, onClose, onImportPlan }) {
             {/* Route preview */}
             {fetchedPlan.route && (
               <div className="text-[11px] font-mono text-slate-400 bg-cockpit-900 p-2 rounded border border-cockpit-border truncate">
-                <strong className="text-slate-300">RUTA:</strong> {fetchedPlan.route}
+                <strong className="text-slate-300">ROUTE:</strong> {fetchedPlan.route}
               </div>
             )}
 
             {/* Fuel & Weights */}
             <div className="flex items-center justify-between text-xs font-mono text-slate-400 pt-1">
-              <span>Combustible Block: <strong className="text-slate-200">{fetchedPlan.fuel?.block}</strong></span>
-              <span>Distancia: <strong className="text-slate-200">{fetchedPlan.distance}</strong></span>
+              <span>Block Fuel: <strong className="text-slate-200">{fetchedPlan.fuel?.block}</strong></span>
+              <span>Distance: <strong className="text-slate-200">{fetchedPlan.distance}</strong></span>
               <span>ETE: <strong className="text-slate-200">{fetchedPlan.ete}</strong></span>
             </div>
 
@@ -162,7 +163,7 @@ export default function SimBriefModal({ isOpen, onClose, onImportPlan }) {
               className="w-full mt-2 py-2.5 rounded-lg bg-cockpit-cyan hover:bg-cyan-400 text-cockpit-950 font-mono font-bold text-xs uppercase tracking-wider flex items-center justify-center gap-2 transition-all shadow-lg shadow-cockpit-cyan/20"
             >
               <Check className="w-4 h-4" />
-              <span>CARGAR EN EL BRIEFING DE VUELO</span>
+              <span>LOAD INTO FLIGHT BRIEFING</span>
             </button>
           </div>
         )}

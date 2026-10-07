@@ -21,7 +21,7 @@ export default function WeatherCard({ weather, windAnalysis }) {
   if (!weather) {
     return (
       <div className="bg-cockpit-900 border border-cockpit-border rounded-xl p-6 text-center text-slate-400 font-mono">
-        No hay datos meteorológicos disponibles para esta estación.
+        No meteorological data available for this station.
       </div>
     );
   }
@@ -74,7 +74,7 @@ export default function WeatherCard({ weather, windAnalysis }) {
             </div>
 
             <h1 className="text-base font-medium text-slate-200 mt-1">
-              {airport?.name || 'Aeródromo'}
+              {airport?.name || 'Aerodrome'}
             </h1>
             <div className="flex flex-wrap items-center gap-3 text-xs font-mono text-slate-400 mt-1.5">
               <span>ELEV: <strong className="text-slate-200">{airport?.elevation || 0} FT</strong></span>
@@ -88,7 +88,7 @@ export default function WeatherCard({ weather, windAnalysis }) {
           {/* ATC Frequencies pill list */}
           {airport?.frequencyList && airport.frequencyList.length > 0 && (
             <div className="flex flex-wrap sm:flex-col gap-1.5 text-xs font-mono bg-cockpit-950 p-2.5 rounded-lg border border-cockpit-border max-w-xs">
-              <span className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">FRECUENCIAS OFICIALES</span>
+              <span className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">OFFICIAL FREQUENCIES</span>
               <div className="flex flex-wrap gap-2">
                 {airport.frequencyList.slice(0, 4).map((f, i) => (
                   <span key={i} className="text-slate-300">
@@ -105,7 +105,7 @@ export default function WeatherCard({ weather, windAnalysis }) {
           <div className="mt-4 pt-4 border-t border-cockpit-border space-y-2">
             <div className="flex items-center gap-2 text-xs font-mono font-bold text-amber-400 tracking-wider uppercase">
               <AlertTriangle className="w-4 h-4 animate-pulse" />
-              ALERTAS METEOROLÓGICAS Y DE AMENAZA EN CABINA ({environmentalThreats.length})
+              METEOROLOGICAL & COCKPIT THREAT ALERTS ({environmentalThreats.length})
             </div>
             <div className="grid grid-cols-1 md:grid-cols-2 gap-2">
               {environmentalThreats.map((threat) => (
@@ -146,11 +146,11 @@ export default function WeatherCard({ weather, windAnalysis }) {
           <div className="flex items-center gap-2">
             <span className="w-2.5 h-2.5 rounded-full bg-cockpit-cyan animate-ping"></span>
             <span className="font-mono font-bold text-sm tracking-wider uppercase text-white">
-              METAR EN TIEMPO REAL
+              REAL-TIME METAR
             </span>
             {metar?.receiptTime && (
               <span className="text-xs font-mono text-slate-400 ml-2">
-                (Observado: {formatZuluDateTime(metar.receiptTime)})
+                (Observed: {formatZuluDateTime(metar.receiptTime)})
               </span>
             )}
           </div>
@@ -159,7 +159,7 @@ export default function WeatherCard({ weather, windAnalysis }) {
             className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-cockpit-850 hover:bg-cockpit-800 border border-cockpit-border text-xs font-mono text-slate-300 transition-colors"
           >
             {copiedMetar ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-            <span>{copiedMetar ? 'COPIADO' : 'COPIAR RAW'}</span>
+            <span>{copiedMetar ? 'COPIED' : 'COPY RAW'}</span>
           </button>
         </div>
 
@@ -175,14 +175,14 @@ export default function WeatherCard({ weather, windAnalysis }) {
           <div className="bg-cockpit-950/80 p-3 rounded-lg border border-cockpit-border/60">
             <div className="flex items-center gap-1.5 text-xs text-slate-400 font-mono mb-1">
               <Wind className="w-3.5 h-3.5 text-cockpit-cyan" />
-              <span>VIENTO</span>
+              <span>WIND</span>
             </div>
             <div className="text-base font-bold font-mono text-white">
               {metar?.wdir !== undefined && metar?.wdir !== null ? `${String(metar.wdir).padStart(3, '0')}°` : 'VRB'} / {metar?.wspd || 0} KT
             </div>
             {metar?.wgst && (
               <div className="text-xs font-mono text-amber-400 font-semibold mt-0.5">
-                Rachas: {metar.wgst} KT
+                Gusts: {metar.wgst} KT
               </div>
             )}
           </div>
@@ -191,7 +191,7 @@ export default function WeatherCard({ weather, windAnalysis }) {
           <div className="bg-cockpit-950/80 p-3 rounded-lg border border-cockpit-border/60">
             <div className="flex items-center gap-1.5 text-xs text-slate-400 font-mono mb-1">
               <Eye className="w-3.5 h-3.5 text-cockpit-cyan" />
-              <span>VISIBILIDAD</span>
+              <span>VISIBILITY</span>
             </div>
             <div className="text-base font-bold font-mono text-white">
               {metar?.visib || '10+'} {typeof metar?.visib === 'number' || (metar?.visib && !metar.visib.includes('KM')) ? 'SM' : ''}
@@ -205,7 +205,7 @@ export default function WeatherCard({ weather, windAnalysis }) {
           <div className="bg-cockpit-950/80 p-3 rounded-lg border border-cockpit-border/60">
             <div className="flex items-center gap-1.5 text-xs text-slate-400 font-mono mb-1">
               <Thermometer className="w-3.5 h-3.5 text-cockpit-cyan" />
-              <span>TEMP / ROCÍO</span>
+              <span>TEMP / DEWPOINT</span>
             </div>
             <div className="text-base font-bold font-mono text-white">
               {metar?.temp !== undefined ? `${metar.temp}°C` : '--'} / {metar?.dewp !== undefined ? `${metar.dewp}°C` : '--'}
@@ -233,15 +233,15 @@ export default function WeatherCard({ weather, windAnalysis }) {
           <div className="bg-cockpit-950/80 p-3 rounded-lg border border-cockpit-border/60">
             <div className="flex items-center gap-1.5 text-xs text-slate-400 font-mono mb-1">
               <Layers className="w-3.5 h-3.5 text-cockpit-cyan" />
-              <span>NUBES / TECHO</span>
+              <span>CLOUDS / CEILING</span>
             </div>
             <div className="text-sm font-bold font-mono text-white truncate">
               {metar?.clouds && metar.clouds.length > 0 
                 ? metar.clouds.map(c => `${c.cover}${c.base ? String(c.base).padStart(3, '0') : ''}`).join(' ')
-                : (metar?.cover || 'DESPEJADO (CLR)')}
+                : (metar?.cover || 'CLEAR (CLR)')}
             </div>
             <div className="text-xs font-mono text-slate-400 mt-0.5">
-              {metar?.clouds?.length || 0} capa(s)
+              {metar?.clouds?.length || 0} layer(s)
             </div>
           </div>
 
@@ -249,7 +249,7 @@ export default function WeatherCard({ weather, windAnalysis }) {
           <div className="bg-cockpit-950/80 p-3 rounded-lg border border-cockpit-border/60">
             <div className="flex items-center gap-1.5 text-xs text-slate-400 font-mono mb-1">
               <ArrowUpRight className="w-3.5 h-3.5 text-cockpit-cyan" />
-              <span>ALT. DENSIDAD</span>
+              <span>DENSITY ALT</span>
             </div>
             <div className="text-base font-bold font-mono text-white">
               {densityAlt !== null ? `${densityAlt} FT` : '----'}
@@ -269,11 +269,11 @@ export default function WeatherCard({ weather, windAnalysis }) {
             <div className="flex items-center gap-2">
               <Clock className="w-4 h-4 text-amber-400" />
               <span className="font-mono font-bold text-sm tracking-wider uppercase text-white">
-                PRONÓSTICO DE AERÓDROMO TAF (EVOLUCIÓN TEMPORAL)
+                TAF AERODROME FORECAST (TIMELINE EVOLUTION)
               </span>
               {taf.validTimeFrom && taf.validTimeTo && (
                 <span className="text-xs font-mono text-slate-400 ml-2">
-                  (Válido: {formatZuluDateTime(taf.validTimeFrom * 1000)} al {formatZuluDateTime(taf.validTimeTo * 1000)})
+                  (Valid: {formatZuluDateTime(taf.validTimeFrom * 1000)} to {formatZuluDateTime(taf.validTimeTo * 1000)})
                 </span>
               )}
             </div>
@@ -283,14 +283,14 @@ export default function WeatherCard({ weather, windAnalysis }) {
                 onClick={() => setShowRawTaf(!showRawTaf)}
                 className="px-2.5 py-1 rounded bg-cockpit-850 hover:bg-cockpit-800 border border-cockpit-border text-xs font-mono text-slate-300"
               >
-                {showRawTaf ? 'OCULTAR RAW' : 'VER RAW TAF'}
+                {showRawTaf ? 'HIDE RAW' : 'VIEW RAW TAF'}
               </button>
               <button
                 onClick={handleCopyTaf}
                 className="flex items-center gap-1.5 px-2.5 py-1 rounded bg-cockpit-850 hover:bg-cockpit-800 border border-cockpit-border text-xs font-mono text-slate-300"
               >
                 {copiedTaf ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
-                <span>{copiedTaf ? 'COPIADO' : 'COPIAR'}</span>
+                <span>{copiedTaf ? 'COPIED' : 'COPY'}</span>
               </button>
             </div>
           </div>
@@ -342,7 +342,7 @@ export default function WeatherCard({ weather, windAnalysis }) {
                     {/* Wind & Gusts */}
                     <div className="flex items-center gap-4">
                       <span>
-                        Viento: <strong className="text-white">
+                        Wind: <strong className="text-white">
                           {fcst.wdir !== undefined ? `${String(fcst.wdir).padStart(3, '0')}°` : 'VRB'} / {fcst.wspd || 0} KT
                         </strong>
                         {fcst.wgst && <span className="text-amber-400 ml-1">G{fcst.wgst}KT</span>}
@@ -355,7 +355,7 @@ export default function WeatherCard({ weather, windAnalysis }) {
 
                       {/* Clouds */}
                       <span>
-                        Nubes: <strong className="text-white">
+                        Clouds: <strong className="text-white">
                           {fcst.clouds && fcst.clouds.length > 0 
                             ? fcst.clouds.map(c => `${c.cover}${c.base ? String(c.base).padStart(3, '0') : ''}`).join(' ') 
                             : 'SKC'}
@@ -375,7 +375,7 @@ export default function WeatherCard({ weather, windAnalysis }) {
             </div>
           ) : (
             <div className="text-xs font-mono text-slate-400">
-              No hay segmentos de pronóstico detallados disponibles en este TAF.
+              No detailed forecast timeline segments available in this TAF.
             </div>
           )}
         </div>

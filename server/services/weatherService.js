@@ -64,8 +64,8 @@ function assessEnvironmentalThreats(metar) {
     threats.push({
       id: 'convective',
       level: 'CRITICAL',
-      title: 'Actividad Convectiva / Tormentas',
-      desc: 'Presencia de tormentas eléctricas o nubes Cumulonimbus (CB/TS) en el aeródromo o inmediaciones.',
+      title: 'Convective Activity / Thunderstorms',
+      desc: 'Active thunderstorms or Cumulonimbus (CB/TS) clouds present at the aerodrome or immediate vicinity.',
       badge: 'THUNDERSTORM / CB',
       icon: 'zap'
     });
@@ -79,8 +79,8 @@ function assessEnvironmentalThreats(metar) {
       threats.push({
         id: 'icing',
         level: 'WARNING',
-        title: 'Condiciones de Engelamiento (Icing Threat)',
-        desc: `Temperatura (${temp}°C) y humedad relativa alta (spread ${spread.toFixed(1)}°C). Requisitos de protección antihielo activados.`,
+        title: 'Icing Conditions (Structural Icing Threat)',
+        desc: `Temperature (${temp}°C) with high relative humidity (spread ${spread.toFixed(1)}°C). Anti-ice protection required.`,
         badge: 'ICING CONDITIONS',
         icon: 'snowflake'
       });
@@ -93,8 +93,8 @@ function assessEnvironmentalThreats(metar) {
     threats.push({
       id: 'low_vis',
       level: metar.fltCat === 'LIFR' ? 'CRITICAL' : 'WARNING',
-      title: 'Baja Visibilidad (LVO / Fog)',
-      desc: `Categoría de vuelo ${metar.fltCat}. Techos bajos o visibilidad reducida. Procedimientos de aproximación de precisión requeridos.`,
+      title: 'Low Visibility (LVO / Fog)',
+      desc: `Flight category ${metar.fltCat}. Low ceilings or restricted visibility. Precision approach procedures in effect.`,
       badge: 'LVO / CAT II/III',
       icon: 'eye-off'
     });
@@ -105,8 +105,8 @@ function assessEnvironmentalThreats(metar) {
     threats.push({
       id: 'wind_hazard',
       level: wgst >= 32 ? 'CRITICAL' : 'WARNING',
-      title: 'Rachas de Viento / Cizalladura',
-      desc: `Viento de ${wspd} kt con rachas de hasta ${wgst || wspd} kt. Precaución con turbulencia en corta final.`,
+      title: 'Wind Gusts / Wind Shear Hazard',
+      desc: `Surface wind ${wspd} kt with gusts up to ${wgst || wspd} kt. Exercise caution for turbulence and airspeed fluctuations on final approach.`,
       badge: `GUSTS ${wgst || wspd}KT`,
       icon: 'wind'
     });
@@ -117,8 +117,8 @@ function assessEnvironmentalThreats(metar) {
     threats.push({
       id: 'low_qnh',
       level: 'CAUTION',
-      title: 'Presión Barométrica Muy Baja',
-      desc: `QNH actual ${altim} hPa. Sistema de baja presión profundo en el área.`,
+      title: 'Very Low Barometric Pressure',
+      desc: `Current altimeter ${altim} hPa. Deep low pressure system in the vicinity.`,
       badge: `QNH ${altim} HPA`,
       icon: 'gauge'
     });

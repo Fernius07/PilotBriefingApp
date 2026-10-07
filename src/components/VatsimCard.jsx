@@ -8,7 +8,7 @@ export default function VatsimCard({ vatsimData, icao }) {
   if (!vatsimData) {
     return (
       <div className="bg-cockpit-900 border border-cockpit-border rounded-xl p-5 text-center text-slate-400 font-mono text-xs">
-        No se pudieron obtener datos de la red VATSIM en este momento.
+        Could not retrieve VATSIM network data at this time.
       </div>
     );
   }
@@ -23,21 +23,21 @@ export default function VatsimCard({ vatsimData, icao }) {
           <div className="flex items-center gap-2">
             <Radio className="w-5 h-5 text-emerald-400" />
             <h2 className="font-mono font-bold text-base tracking-wider uppercase text-white">
-              COBERTURA ATC Y TRÁFICO EN RED (VATSIM)
+              ATC COVERAGE & NETWORK TRAFFIC (VATSIM)
             </h2>
             {hasAtcOnline ? (
               <span className="px-2 py-0.5 rounded-full bg-emerald-500/20 text-emerald-400 border border-emerald-500/40 text-xs font-mono font-bold flex items-center gap-1">
                 <span className="w-2 h-2 rounded-full bg-emerald-400 animate-pulse"></span>
-                {controllers.length} CONTROLADOR(ES) ONLINE
+                {controllers.length} CONTROLLER(S) ONLINE
               </span>
             ) : (
               <span className="px-2 py-0.5 rounded-full bg-slate-700/40 text-slate-400 border border-slate-600 text-xs font-mono">
-                UNICOM 122.800 (SIN ATC)
+                UNICOM 122.800 (NO ATC)
               </span>
             )}
           </div>
           <p className="text-xs text-slate-400 mt-1 font-mono">
-            Integración en vivo con simuladores (MSFS 2024/2020, X-Plane, P3D)
+            Live network integration for flight simulators (MSFS, X-Plane, Prepar3D)
           </p>
         </div>
 
@@ -52,7 +52,7 @@ export default function VatsimCard({ vatsimData, icao }) {
             }`}
           >
             <Wifi className="w-3.5 h-3.5" />
-            <span>ESTACIONES ATC ({controllers?.length || 0})</span>
+            <span>ATC STATIONS ({controllers?.length || 0})</span>
           </button>
           <button
             onClick={() => setActiveTab('TRAFFIC')}
@@ -63,7 +63,7 @@ export default function VatsimCard({ vatsimData, icao }) {
             }`}
           >
             <Users className="w-3.5 h-3.5" />
-            <span>TRÁFICO ({ (inbounds?.length || 0) + (outbounds?.length || 0) })</span>
+            <span>TRAFFIC ({ (inbounds?.length || 0) + (outbounds?.length || 0) })</span>
           </button>
         </div>
       </div>
@@ -93,7 +93,7 @@ export default function VatsimCard({ vatsimData, icao }) {
                     </div>
 
                     <div className="flex items-center justify-between bg-cockpit-900 p-2 rounded-lg border border-cockpit-border font-mono text-xs">
-                      <span className="text-slate-400">FRECUENCIA:</span>
+                      <span className="text-slate-400">FREQUENCY:</span>
                       <span className="text-white font-bold text-sm tracking-wider">{ctrl.frequency} MHz</span>
                     </div>
                   </div>
@@ -112,10 +112,10 @@ export default function VatsimCard({ vatsimData, icao }) {
                 <Radio className="w-5 h-5" />
               </div>
               <div className="font-mono text-sm font-bold text-slate-200">
-                No hay controladores conectados para {icao} actualmente
+                No controllers currently online for {icao}
               </div>
               <p className="text-xs font-mono text-slate-400 max-w-md mx-auto">
-                Opere bajo auto-coordinación en la frecuencia Unicom <strong className="text-cockpit-cyan">122.800 MHz</strong> transmitiendo intenciones en rodaje, pista y circuito.
+                Operate under self-announcement on Unicom frequency <strong className="text-cockpit-cyan">122.800 MHz</strong> broadcasting intentions for taxi, runway, and pattern.
               </p>
             </div>
           )}
@@ -131,7 +131,7 @@ export default function VatsimCard({ vatsimData, icao }) {
             <div className="flex items-center justify-between pb-2 border-b border-cockpit-border">
               <span className="text-xs font-mono font-bold text-slate-300 flex items-center gap-1.5">
                 <PlaneLanding className="w-4 h-4 text-cockpit-cyan" />
-                LLEGADAS PREVISTAS ({inbounds?.length || 0})
+                EXPECTED ARRIVALS ({inbounds?.length || 0})
               </span>
             </div>
             {inbounds && inbounds.length > 0 ? (
@@ -143,7 +143,7 @@ export default function VatsimCard({ vatsimData, icao }) {
                       <span className="text-slate-400 ml-2">({flight.aircraft})</span>
                     </div>
                     <div className="text-right text-slate-400">
-                      <span>Desde <strong className="text-cockpit-cyan">{flight.departure || '???'}</strong></span>
+                      <span>From <strong className="text-cockpit-cyan">{flight.departure || '???'}</strong></span>
                       <div className="text-[10px]">FL{Math.round(flight.altitude / 100)} • {flight.groundspeed}kt</div>
                     </div>
                   </div>
@@ -151,7 +151,7 @@ export default function VatsimCard({ vatsimData, icao }) {
               </div>
             ) : (
               <div className="text-xs font-mono text-slate-500 py-4 text-center">
-                Sin vuelos entrantes reportados en VATSIM
+                No inbound flights reported on VATSIM
               </div>
             )}
           </div>
@@ -161,7 +161,7 @@ export default function VatsimCard({ vatsimData, icao }) {
             <div className="flex items-center justify-between pb-2 border-b border-cockpit-border">
               <span className="text-xs font-mono font-bold text-slate-300 flex items-center gap-1.5">
                 <PlaneTakeoff className="w-4 h-4 text-amber-400" />
-                SALIDAS PREVISTAS ({outbounds?.length || 0})
+                EXPECTED DEPARTURES ({outbounds?.length || 0})
               </span>
             </div>
             {outbounds && outbounds.length > 0 ? (
@@ -173,7 +173,7 @@ export default function VatsimCard({ vatsimData, icao }) {
                       <span className="text-slate-400 ml-2">({flight.aircraft})</span>
                     </div>
                     <div className="text-right text-slate-400">
-                      <span>Hacia <strong className="text-amber-400">{flight.arrival || '???'}</strong></span>
+                      <span>To <strong className="text-amber-400">{flight.arrival || '???'}</strong></span>
                       <div className="text-[10px]">FL{Math.round(flight.altitude / 100)} • {flight.groundspeed}kt</div>
                     </div>
                   </div>
@@ -181,7 +181,7 @@ export default function VatsimCard({ vatsimData, icao }) {
               </div>
             ) : (
               <div className="text-xs font-mono text-slate-500 py-4 text-center">
-                Sin vuelos salientes reportados en VATSIM
+                No outbound flights reported on VATSIM
               </div>
             )}
           </div>

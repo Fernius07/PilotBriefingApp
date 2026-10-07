@@ -106,11 +106,11 @@ export default function NotamMapModal({ notam, airportCoords, onClose }) {
       const popupContent = `
         <div style="font-family: monospace; font-size: 11px; color: #f8fafc; background: #0c131d; padding: 6px; border-radius: 6px; min-width: 190px;">
           <strong style="color: ${shapeColor}; font-size: 13px;">${notam.number || notam.id}</strong><br/>
-          <span style="color: #94a3b8;">${notam.threatLabel || notam.title || 'Aviso de Navegación'}</span><br/>
-          ${shape === 'POLYGON' ? `<span style="color: #c084fc;">📐 Zona Acotada (${polygonPoints.length || vertexCount} vértices)</span><br/>` : ''}
+          <span style="color: #94a3b8;">${notam.threatLabel || notam.title || 'Navigation Notice'}</span><br/>
+          ${shape === 'POLYGON' ? `<span style="color: #c084fc;">📐 Bounded Area (${polygonPoints.length || vertexCount} vertices)</span><br/>` : ''}
           ${locationName ? `<span style="color: #38bdf8;">📍 ${locationName}</span><br/>` : ''}
-          ${shape === 'CIRCLE' && radiusMeters ? `<span style="color: #cbd5e1;">Radio: ${radiusMeters >= 1000 ? `${(radiusMeters / 1000).toFixed(1)} km` : `${radiusMeters} m`} (${radiusNm} NM)</span><br/>` : ''}
-          ${lowerLimit || upperLimit ? `<span style="color: #a78bfa;">Límites: ${lowerLimit || 'SFC'} - ${upperLimit || 'UNL'}</span>` : ''}
+          ${shape === 'CIRCLE' && radiusMeters ? `<span style="color: #cbd5e1;">Radius: ${radiusMeters >= 1000 ? `${(radiusMeters / 1000).toFixed(1)} km` : `${radiusMeters} m`} (${radiusNm} NM)</span><br/>` : ''}
+          ${lowerLimit || upperLimit ? `<span style="color: #a78bfa;">Limits: ${lowerLimit || 'SFC'} - ${upperLimit || 'UNL'}</span>` : ''}
         </div>
       `;
 
@@ -131,7 +131,7 @@ export default function NotamMapModal({ notam, airportCoords, onClose }) {
 
       let activeBounds = null;
 
-      // CASE A: POLYGON (Zona Acotada / Polígono)
+      // CASE A: POLYGON (Demarcated Area / Polygon)
       if (shape === 'POLYGON' && polygonPoints && polygonPoints.length >= 3) {
         const polygon = L.polygon(polygonPoints, {
           color: shapeColor,
@@ -141,7 +141,7 @@ export default function NotamMapModal({ notam, airportCoords, onClose }) {
           fillOpacity: 0.28,
         }).addTo(map);
 
-        polygon.bindTooltip(`Zona Acotada (${polygonPoints.length} vértices)`, {
+        polygon.bindTooltip(`Bounded Area (${polygonPoints.length} vertices)`, {
           permanent: false,
           direction: 'center',
           className: 'bg-cockpit-950 text-white font-mono text-[11px] border border-cockpit-border p-1 rounded font-bold'
@@ -154,7 +154,7 @@ export default function NotamMapModal({ notam, airportCoords, onClose }) {
         activeBounds = polygon.getBounds();
       }
 
-      // CASE B: CIRCLE (Punto y Radio de Alcance)
+      // CASE B: CIRCLE (Point & Radius)
       else if (shape === 'CIRCLE' && radiusMeters && radiusMeters > 0) {
         const restrictionCircle = L.circle([effectiveLat, effectiveLon], {
           radius: radiusMeters,
@@ -166,7 +166,7 @@ export default function NotamMapModal({ notam, airportCoords, onClose }) {
           dashArray: '6, 6',
         }).addTo(map);
 
-        restrictionCircle.bindTooltip(`Radio: ${radiusMeters >= 1000 ? `${(radiusMeters / 1000).toFixed(1)} km` : `${radiusMeters} m`} (${radiusNm || ''} NM)`, {
+        restrictionCircle.bindTooltip(`Radius: ${radiusMeters >= 1000 ? `${(radiusMeters / 1000).toFixed(1)} km` : `${radiusMeters} m`} (${radiusNm || ''} NM)`, {
           permanent: true,
           direction: 'top',
           className: 'bg-cockpit-950 text-white font-mono text-[11px] border border-cockpit-border p-1 rounded font-bold'
@@ -178,7 +178,7 @@ export default function NotamMapModal({ notam, airportCoords, onClose }) {
         activeBounds = restrictionCircle.getBounds();
       }
 
-      // CASE C: POINT (Punto Concreto - Sin radio ni círculo)
+      // CASE C: POINT (Specific Point)
       else {
         const marker = L.marker([effectiveLat, effectiveLon], { icon: customIcon }).addTo(map);
         marker.bindPopup(popupContent, { autoPan: true, autoPanPadding: [50, 50], closeButton: true }).openPopup();
@@ -201,7 +201,7 @@ export default function NotamMapModal({ notam, airportCoords, onClose }) {
 
         L.marker([airportCoords.lat, airportCoords.lon], { icon: aptIcon })
           .addTo(map)
-          .bindTooltip(`Aeródromo (${airportCoords.lat.toFixed(3)}°, ${airportCoords.lon.toFixed(3)}°)`, { direction: 'bottom' });
+          .bindTooltip(`Airport (${airportCoords.lat.toFixed(3)}°, ${airportCoords.lon.toFixed(3)}°)`, { direction: 'bottom' });
 
         const distanceMeters = map.distance([airportCoords.lat, airportCoords.lon], [effectiveLat, effectiveLon]);
         if (distanceMeters > 300) {
@@ -266,7 +266,7 @@ export default function NotamMapModal({ notam, airportCoords, onClose }) {
   } = geo;
 
   const formattedStart = notam.startDateFormatted || formatNotamDate(notam.startDate);
-  const formattedEnd = notam.isPermanent ? 'PERMANENTE' : (notam.endDateFormatted || formatNotamDate(notam.endDate));
+  const formattedEnd = notam.isPermanent ? 'PERMANENT' : (notam.endDateFormatted || formatNotamDate(notam.endDate));
 
   const handleCopyRaw = () => {
     if (notam.rawText && navigator.clipboard) {
@@ -319,19 +319,19 @@ export default function NotamMapModal({ notam, airportCoords, onClose }) {
                 {shape === 'POLYGON' && (
                   <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-purple-500/20 text-purple-300 border border-purple-500/40 flex items-center gap-1">
                     <Layers className="w-3 h-3 text-purple-400" />
-                    ZONA ACOTADA ({polygonPoints.length || vertexCount} VÉRTICES)
+                    BOUNDED AREA ({polygonPoints.length || vertexCount} VERTICES)
                   </span>
                 )}
                 {shape === 'CIRCLE' && (
                   <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-amber-500/20 text-amber-300 border border-amber-500/40 flex items-center gap-1">
                     <Radio className="w-3 h-3 text-amber-400" />
-                    PUNTO Y RADIO ({radiusMeters >= 1000 ? `${(radiusMeters / 1000).toFixed(1)} km` : `${radiusMeters} m`})
+                    POINT & RADIUS ({radiusMeters >= 1000 ? `${(radiusMeters / 1000).toFixed(1)} km` : `${radiusMeters} m`})
                   </span>
                 )}
                 {shape === 'POINT' && (
                   <span className="px-2 py-0.5 rounded text-[10px] font-mono font-bold bg-sky-500/20 text-sky-300 border border-sky-500/40 flex items-center gap-1">
                     <MapPin className="w-3 h-3 text-sky-400" />
-                    PUNTO CONCRETO
+                    SPECIFIC POINT
                   </span>
                 )}
 
@@ -348,18 +348,18 @@ export default function NotamMapModal({ notam, airportCoords, onClose }) {
               <p className="text-xs font-mono text-slate-400 mt-0.5 truncate">
                 {locationName ? `📍 ${locationName} • ` : ''}
                 {shape === 'POLYGON' 
-                  ? 'Polígono delimitado del espacio aéreo' 
+                  ? 'Demarcated airspace polygon' 
                   : shape === 'CIRCLE' 
-                    ? 'Radio circular de alcance y afección aérea' 
+                    ? 'Circular radius of operational impact' 
                     : shape === 'POINT'
-                      ? 'Ubicación precisa del aviso / obstáculo'
-                      : 'Información y ubicación de referencia del aeródromo'}
+                      ? 'Precise notice / obstacle location'
+                      : 'Airport reference point & general notice'}
               </p>
             </div>
           </div>
 
           <div className="flex items-center gap-2 flex-shrink-0">
-            {/* Map Type Switcher: Normal & Satélite */}
+            {/* Map Type Switcher: Normal & Satellite */}
             <div className="hidden sm:flex items-center bg-cockpit-850 p-1 rounded-lg border border-cockpit-border text-[11px] font-mono">
               <button
                 onClick={() => setMapType('NORMAL')}
@@ -371,14 +371,14 @@ export default function NotamMapModal({ notam, airportCoords, onClose }) {
                 onClick={() => setMapType('SATELLITE')}
                 className={`px-2.5 py-1 rounded transition-colors ${mapType === 'SATELLITE' ? 'bg-cockpit-cyan text-black font-bold' : 'text-slate-400 hover:text-white'}`}
               >
-                Satélite
+                Satellite
               </button>
             </div>
 
             <button
               onClick={onClose}
               className="p-1.5 rounded-lg text-slate-400 hover:text-white hover:bg-cockpit-800 transition-colors"
-              title="Cerrar modal"
+              title="Close modal"
             >
               <X className="w-5 h-5" />
             </button>
@@ -391,26 +391,26 @@ export default function NotamMapModal({ notam, airportCoords, onClose }) {
             {shape === 'POLYGON' ? (
               <>
                 <span>
-                  ÁREA: <strong className="text-purple-300">{polygonPoints.length || vertexCount} VÉRTICES</strong>
+                  AREA: <strong className="text-purple-300">{polygonPoints.length || vertexCount} VERTICES</strong>
                 </span>
                 <span className="text-slate-600">•</span>
                 <span>
-                  CENTRO: <strong className="text-cockpit-cyan">{effectiveLat?.toFixed(4)}°, {effectiveLon?.toFixed(4)}°</strong>
+                  CENTER: <strong className="text-cockpit-cyan">{effectiveLat?.toFixed(4)}°, {effectiveLon?.toFixed(4)}°</strong>
                 </span>
               </>
             ) : shape === 'CIRCLE' ? (
               <>
                 <span>
-                  CENTRO: <strong className="text-cockpit-cyan">{coordText || `${effectiveLat?.toFixed(4)}°, ${effectiveLon?.toFixed(4)}°`}</strong>
+                  CENTER: <strong className="text-cockpit-cyan">{coordText || `${effectiveLat?.toFixed(4)}°, ${effectiveLon?.toFixed(4)}°`}</strong>
                 </span>
                 <span className="text-slate-600">•</span>
                 <span>
-                  RADIO: <strong className="text-amber-400">{radiusMeters >= 1000 ? `${(radiusMeters / 1000).toFixed(1)} KM` : `${radiusMeters} M`} ({radiusNm} NM)</strong>
+                  RADIUS: <strong className="text-amber-400">{radiusMeters >= 1000 ? `${(radiusMeters / 1000).toFixed(1)} KM` : `${radiusMeters} M`} ({radiusNm} NM)</strong>
                 </span>
               </>
             ) : (
               <span>
-                COORD: <strong className="text-cockpit-cyan">{coordText || (effectiveLat ? `${effectiveLat.toFixed(4)}°, ${effectiveLon.toFixed(4)}°` : 'Aeródromo')}</strong>
+                COORD: <strong className="text-cockpit-cyan">{coordText || (effectiveLat ? `${effectiveLat.toFixed(4)}°, ${effectiveLon.toFixed(4)}°` : 'Airport')}</strong>
               </span>
             )}
 
@@ -418,7 +418,7 @@ export default function NotamMapModal({ notam, airportCoords, onClose }) {
               <>
                 <span className="text-slate-600">•</span>
                 <span>
-                  LÍMITES: <strong className="text-purple-400">{lowerLimit || 'SFC'} AL {upperLimit || 'UNL'}</strong>
+                  LIMITS: <strong className="text-purple-400">{lowerLimit || 'SFC'} TO {upperLimit || 'UNL'}</strong>
                 </span>
               </>
             )}
@@ -427,11 +427,11 @@ export default function NotamMapModal({ notam, airportCoords, onClose }) {
           {/* Dates in strict DD/MM/YYYY HHMMZ / HHMM LT */}
           <div className="flex flex-wrap items-center gap-2 text-[11px] text-slate-400">
             <span>
-              DESDE: <strong className="text-slate-200">{formattedStart}</strong>
+              FROM: <strong className="text-slate-200">{formattedStart}</strong>
             </span>
             <span className="text-slate-600">•</span>
             <span>
-              HASTA: <strong className={notam.isPermanent ? 'text-amber-400 font-bold' : 'text-slate-200'}>{formattedEnd}</strong>
+              TO: <strong className={notam.isPermanent ? 'text-amber-400 font-bold' : 'text-slate-200'}>{formattedEnd}</strong>
             </span>
           </div>
         </div>
@@ -447,7 +447,7 @@ export default function NotamMapModal({ notam, airportCoords, onClose }) {
             }`}
           >
             <MapIcon className="w-3.5 h-3.5" />
-            <span>MAPA INTERACTIVO</span>
+            <span>INTERACTIVE MAP</span>
           </button>
           <button
             onClick={() => setMobileTab('INFO')}
@@ -458,7 +458,7 @@ export default function NotamMapModal({ notam, airportCoords, onClose }) {
             }`}
           >
             <FileText className="w-3.5 h-3.5" />
-            <span>TEXTO Y DETALLES</span>
+            <span>TEXT & DETAILS</span>
           </button>
         </div>
 
@@ -482,7 +482,7 @@ export default function NotamMapModal({ notam, airportCoords, onClose }) {
                 onClick={() => setMapType('SATELLITE')}
                 className={`px-2 py-0.5 rounded transition-colors ${mapType === 'SATELLITE' ? 'bg-cockpit-cyan text-black font-bold' : 'text-slate-400'}`}
               >
-                Satélite
+                Satellite
               </button>
             </div>
 
@@ -495,8 +495,8 @@ export default function NotamMapModal({ notam, airportCoords, onClose }) {
             {mapError && (
               <div className="absolute inset-0 flex flex-col items-center justify-center p-6 bg-cockpit-950 text-center font-mono text-xs text-rose-300 space-y-2">
                 <AlertTriangle className="w-6 h-6 text-rose-400" />
-                <span>No se pudo cargar la capa cartográfica interactiva.</span>
-                <span className="text-slate-400">Coordenadas del aviso: {coordText || 'Ubicación de aeródromo'}</span>
+                <span>Could not load interactive cartographic layer.</span>
+                <span className="text-slate-400">Notice coordinates: {coordText || 'Airport location'}</span>
               </div>
             )}
           </div>
@@ -511,7 +511,7 @@ export default function NotamMapModal({ notam, airportCoords, onClose }) {
               <div className="flex items-center justify-between pb-1.5 border-b border-cockpit-border/60">
                 <div className="flex items-center gap-2 text-cockpit-cyan font-bold tracking-wide">
                   <ShieldAlert className="w-4 h-4 text-cockpit-cyan" />
-                  <span>TRADUCCIÓN EN LENGUAJE CLARO</span>
+                  <span>PLAIN LANGUAGE DECODED</span>
                 </div>
                 <span className="text-[10px] text-slate-400 uppercase">
                   {notam.category || 'GENERAL'}
@@ -525,7 +525,7 @@ export default function NotamMapModal({ notam, airportCoords, onClose }) {
             {/* Crew Operational Advice if present */}
             {notam.crewAdvice && (
               <div className="p-3 bg-amber-500/10 border border-amber-500/30 rounded-xl flex items-start gap-2.5 text-amber-200">
-                <span className="text-amber-400 font-bold flex-shrink-0">💡 RECOMENDACIÓN:</span>
+                <span className="text-amber-400 font-bold flex-shrink-0">💡 RECOMMENDATION:</span>
                 <span className="leading-snug">{notam.crewAdvice}</span>
               </div>
             )}
@@ -534,15 +534,15 @@ export default function NotamMapModal({ notam, airportCoords, onClose }) {
             <div className="bg-cockpit-950 p-4 rounded-xl border border-cockpit-border space-y-2 shadow-sm">
               <div className="flex items-center justify-between pb-1.5 border-b border-cockpit-border/60">
                 <span className="text-slate-400 font-bold uppercase tracking-wider text-[11px]">
-                  MENSAJE ORIGINAL RAW (ICAO / FAA)
+                  ORIGINAL RAW MESSAGE (ICAO / FAA)
                 </span>
                 <button
                   onClick={handleCopyRaw}
                   className="px-2.5 py-1 rounded bg-cockpit-850 hover:bg-cockpit-800 text-slate-300 hover:text-white border border-cockpit-border text-[10px] flex items-center gap-1.5 transition-colors font-mono"
-                  title="Copiar texto original"
+                  title="Copy raw text"
                 >
                   {copiedRaw ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5 text-slate-400" />}
-                  <span>{copiedRaw ? 'COPIADO' : 'COPIAR RAW'}</span>
+                  <span>{copiedRaw ? 'COPIED' : 'COPY RAW'}</span>
                 </button>
               </div>
 
@@ -555,15 +555,15 @@ export default function NotamMapModal({ notam, airportCoords, onClose }) {
             <div className="p-3 bg-cockpit-950/80 rounded-xl border border-cockpit-border/70 text-[11px] text-slate-300 space-y-1.5">
               <div className="flex items-center gap-2 text-slate-400 font-bold">
                 <Clock className="w-3.5 h-3.5 text-sky-400" />
-                <span>VENTANA OPERACIONAL DE VALIDEZ:</span>
+                <span>OPERATIONAL VALIDITY WINDOW:</span>
               </div>
               <div className="flex flex-col gap-1 text-[11px]">
                 <div className="bg-cockpit-900/90 p-2 rounded border border-cockpit-border flex items-center justify-between">
-                  <span className="text-slate-400">DESDE (INICIO):</span>
+                  <span className="text-slate-400">FROM (EFFECTIVE):</span>
                   <strong className="text-white">{formattedStart}</strong>
                 </div>
                 <div className="bg-cockpit-900/90 p-2 rounded border border-cockpit-border flex items-center justify-between">
-                  <span className="text-slate-400">HASTA (FIN):</span>
+                  <span className="text-slate-400">TO (EXPIRATION):</span>
                   <strong className={notam.isPermanent ? 'text-amber-400 font-bold' : 'text-white'}>
                     {formattedEnd}
                   </strong>

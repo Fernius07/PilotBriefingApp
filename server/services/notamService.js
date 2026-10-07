@@ -1,3 +1,6 @@
+// Ensure Node.js does not abort on FAA / government intermediate SSL certificates (critical for Vercel/cloud environments)
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
 const { 
   classifyNotam, 
   decodePlainLanguage, 
@@ -16,30 +19,63 @@ async function fetchAirportNotams(icao) {
   if (!code) throw new Error('ICAO code is required');
 
   const url = 'https://notams.aim.faa.gov/notamSearch/search';
-
   const body = `searchType=0&designatorsForLocation=${encodeURIComponent(code)}`;
 
-  const headers = {
+  let sessionCookie = 'DR_SITE_PM=https://notams.aim.faa.gov/notamSearch/;';
+
+  const buildHeaders = (cookie) => ({
     'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
-    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36'
-  };
+    'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+    'Referer': 'https://notams.aim.faa.gov/notamSearch/',
+    'Origin': 'https://notams.aim.faa.gov',
+    'Accept': 'application/json, text/javascript, */*; q=0.01',
+    'Cookie': cookie || sessionCookie
+  });
 
   let rawNotams = [];
   try {
-    const res = await fetch(url, {
+    console.log(`[NOTAM Service] Querying FAA NOTAM system for: ${code}...`);
+    let res = await fetch(url, {
       method: 'POST',
-      headers,
+      headers: buildHeaders(sessionCookie),
       body
     });
+
+    // If 403 or non-200, attempt dynamic session cookie handshake from main search page
+    if (!res.ok) {
+      console.warn(`[NOTAM Service] Initial POST returned ${res.status}. Refreshing FAA session cookie...`);
+      try {
+        const handshakeRes = await fetch('https://notams.aim.faa.gov/notamSearch/', {
+          headers: {
+            'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+            'Accept': 'text/html,application/xhtml+xml,application/xml;q=0.9,*/*;q=0.8'
+          }
+        });
+        const dynamicCookie = handshakeRes.headers.get('set-cookie');
+        if (dynamicCookie) {
+          sessionCookie = dynamicCookie;
+        }
+        res = await fetch(url, {
+          method: 'POST',
+          headers: buildHeaders(sessionCookie),
+          body
+        });
+      } catch (handshakeErr) {
+        console.warn('[NOTAM Service] FAA handshake attempt error:', handshakeErr.message);
+      }
+    }
+
+    console.log(`[NOTAM Service] FAA Response status for ${code}: ${res.status}`);
 
     if (res.ok) {
       const data = await res.json();
       rawNotams = data.notamList || [];
+      console.log(`[NOTAM Service] Received ${rawNotams.length} NOTAMs for ${code} (total count in feed: ${data.totalNotamCount})`);
     } else {
-      console.warn(`FAA NOTAM endpoint returned status ${res.status} for ${code}`);
+      console.warn(`[NOTAM Service] FAA NOTAM endpoint returned status ${res.status} for ${code}`);
     }
   } catch (err) {
-    console.error(`Error requesting NOTAMs for ${code}:`, err.message);
+    console.error(`[NOTAM Service] Error requesting NOTAMs for ${code}:`, err.message);
   }
 
   // Process and decode NOTAMs

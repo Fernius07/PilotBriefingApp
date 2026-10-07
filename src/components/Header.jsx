@@ -1,7 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { 
-  Plane, Search, RefreshCw, Moon, Sun, 
-  Printer, Radio, Clock, ShieldAlert, Sparkles, MapPin, Database
+  Plane, Search, RefreshCw, Clock, MapPin, Database
 } from 'lucide-react';
 
 const QUICK_AIRPORTS = ['LEMD', 'KJFK', 'EGLL', 'LFPG', 'EDDF', 'KLAX', 'OMDB', 'SAEZ'];
@@ -11,12 +10,7 @@ export default function Header({
   onSearch, 
   loading, 
   onRefresh, 
-  onOpenSimbrief, 
-  nightVision, 
-  setNightVision,
-  onPrint,
-  lastUpdated,
-  activeRoute
+  onOpenSimbrief
 }) {
   const [searchInput, setSearchInput] = useState('');
   const [zuluTime, setZuluTime] = useState('');
@@ -59,7 +53,7 @@ export default function Header({
                 <span className="font-bold text-lg tracking-wider text-slate-100 font-mono">
                   PILOT<span className="text-cockpit-cyan">BRIEFING</span>
                 </span>
-                <span className="px-1.5 py-0.5 text-xs font-bold rounded bg-cockpit-cyan text-cockpit-950 uppercase tracking-wider">APP</span>
+                <span className="px-1.5 py-0.5 text-xs font-bold rounded bg-cockpit-cyan text-cockpit-950 uppercase tracking-wider font-mono">APP</span>
               </div>
               <div className="flex items-center gap-2 text-xs text-slate-400">
                 <span className="inline-flex items-center gap-1.5 text-emerald-400 font-mono">
@@ -78,19 +72,19 @@ export default function Header({
           {/* Mobile Right Tools */}
           <div className="flex md:hidden items-center gap-2">
             <button
+              onClick={onOpenSimbrief}
+              className="p-2 rounded-lg bg-amber-500/10 border border-amber-500/30 text-amber-400 text-xs font-mono"
+              title="Import flight plan from SimBrief"
+            >
+              <Database className="w-4 h-4" />
+            </button>
+            <button
               onClick={onRefresh}
               disabled={loading}
               className="p-2 rounded-lg bg-cockpit-800 border border-cockpit-border text-slate-300 hover:text-white"
-              title="Actualizar datos reales"
+              title="Refresh live data"
             >
               <RefreshCw className={`w-4 h-4 ${loading ? 'animate-spin text-cockpit-cyan' : ''}`} />
-            </button>
-            <button
-              onClick={() => setNightVision(!nightVision)}
-              className={`p-2 rounded-lg border ${nightVision ? 'bg-rose-500/20 border-rose-500/50 text-rose-400' : 'bg-cockpit-800 border-cockpit-border text-slate-400'}`}
-              title="Modo visión nocturna de cabina"
-            >
-              <Moon className="w-4 h-4" />
             </button>
           </div>
         </div>
@@ -105,7 +99,7 @@ export default function Header({
               type="text"
               value={searchInput}
               onChange={(e) => setSearchInput(e.target.value.toUpperCase())}
-              placeholder="Buscar ICAO (ej. LEMD, KJFK, EGLL, KLAX)..."
+              placeholder="Search ICAO (e.g. LEMD, KJFK, EGLL, KLAX)..."
               maxLength={5}
               className="w-full pl-9 pr-24 py-2 bg-cockpit-950 border border-cockpit-border rounded-lg text-sm text-slate-100 placeholder-slate-500 font-mono tracking-widest focus:outline-none focus:border-cockpit-cyan transition-colors"
             />
@@ -114,14 +108,14 @@ export default function Header({
               disabled={loading || searchInput.trim().length < 3}
               className="absolute right-1 px-3 py-1.5 rounded-md bg-cockpit-cyan/20 hover:bg-cockpit-cyan text-cockpit-cyan hover:text-cockpit-950 border border-cockpit-cyan/40 text-xs font-mono font-semibold transition-all disabled:opacity-40"
             >
-              CONSULTAR
+              SEARCH
             </button>
           </form>
 
           {/* Quick Airports Pills */}
           <div className="flex items-center gap-1.5 mt-2 overflow-x-auto pb-1 no-scrollbar text-xs">
             <span className="text-[11px] font-mono text-slate-500 uppercase flex items-center gap-1 mr-1">
-              <MapPin className="w-3 h-3" /> Frecuentes:
+              <MapPin className="w-3 h-3" /> Frequent:
             </span>
             {QUICK_AIRPORTS.map((code) => (
               <button
@@ -139,13 +133,13 @@ export default function Header({
           </div>
         </div>
 
-        {/* Action Buttons: SimBrief, Refresh, Night Vision, Print */}
+        {/* Action Buttons: SimBrief, Refresh */}
         <div className="hidden md:flex items-center gap-2">
           {/* SimBrief Button */}
           <button
             onClick={onOpenSimbrief}
             className="px-3 py-2 rounded-lg bg-amber-500/10 hover:bg-amber-500/20 border border-amber-500/30 text-amber-400 text-xs font-mono font-semibold flex items-center gap-1.5 transition-all shadow-sm"
-            title="Importar plan de vuelo desde SimBrief"
+            title="Import operational flight plan from SimBrief"
           >
             <Database className="w-3.5 h-3.5" />
             SIMBRIEF OFP
@@ -156,32 +150,10 @@ export default function Header({
             onClick={onRefresh}
             disabled={loading}
             className="px-3 py-2 rounded-lg bg-cockpit-850 hover:bg-cockpit-800 border border-cockpit-border text-slate-300 hover:text-cockpit-cyan text-xs font-mono flex items-center gap-1.5 transition-all disabled:opacity-50"
-            title="Recargar datos en tiempo real de NOAA y FAA"
+            title="Refresh real-time data from NOAA and FAA"
           >
             <RefreshCw className={`w-3.5 h-3.5 ${loading ? 'animate-spin text-cockpit-cyan' : ''}`} />
-            <span>ACTUALIZAR</span>
-          </button>
-
-          {/* Print Briefing Dossier */}
-          <button
-            onClick={onPrint}
-            className="p-2 rounded-lg bg-cockpit-850 hover:bg-cockpit-800 border border-cockpit-border text-slate-300 hover:text-white"
-            title="Imprimir / Exportar Dossier de Vuelo (PDF)"
-          >
-            <Printer className="w-4 h-4" />
-          </button>
-
-          {/* Night Vision Red Tint Toggle */}
-          <button
-            onClick={() => setNightVision(!nightVision)}
-            className={`p-2 rounded-lg border transition-all ${
-              nightVision 
-                ? 'bg-rose-500/20 border-rose-500/60 text-rose-400 glow-red' 
-                : 'bg-cockpit-850 hover:bg-cockpit-800 border-cockpit-border text-slate-400 hover:text-slate-200'
-            }`}
-            title={nightVision ? "Desactivar modo visión nocturna" : "Activar visión nocturna de cabina"}
-          >
-            <Moon className="w-4 h-4" />
+            <span>REFRESH</span>
           </button>
         </div>
 

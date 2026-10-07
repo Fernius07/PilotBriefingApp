@@ -25,7 +25,7 @@ export default function NotamSection({ notamsData, icao, airportCoords }) {
   if (!notamsData || !notamsData.notams) {
     return (
       <div className="bg-cockpit-900 border border-cockpit-border rounded-xl p-6 text-center text-slate-400 font-mono">
-        No hay avisos NOTAM disponibles para {icao}.
+        No NOTAM notices available for {icao}.
       </div>
     );
   }
@@ -70,7 +70,7 @@ export default function NotamSection({ notamsData, icao, airportCoords }) {
   const getSeverityBadge = (severity, isUpcoming = false) => {
     if (isUpcoming) {
       return {
-        label: 'PRÓXIMAMENTE',
+        label: 'UPCOMING',
         bg: 'bg-amber-500/20 text-amber-300 border-amber-500/40',
         dot: 'bg-amber-400'
       };
@@ -78,19 +78,19 @@ export default function NotamSection({ notamsData, icao, airportCoords }) {
     switch (severity) {
       case 'CRITICAL':
         return {
-          label: 'CRÍTICO',
+          label: 'CRITICAL',
           bg: 'bg-rose-500/20 text-rose-400 border-rose-500/50 glow-red',
           dot: 'bg-rose-400'
         };
       case 'WARNING':
         return {
-          label: 'ADVERTENCIA',
+          label: 'WARNING',
           bg: 'bg-amber-500/20 text-amber-400 border-amber-500/40 glow-amber',
           dot: 'bg-amber-400'
         };
       case 'CAUTION':
         return {
-          label: 'PRECAUCIÓN',
+          label: 'CAUTION',
           bg: 'bg-yellow-500/15 text-yellow-300 border-yellow-500/30',
           dot: 'bg-yellow-400'
         };
@@ -111,7 +111,7 @@ export default function NotamSection({ notamsData, icao, airportCoords }) {
     <div className="space-y-5">
       
       {/* ========================================================================= */}
-      {/* 🌟 ZONA DE RESUMEN DE IMPACTO OPERACIONAL (EXECUTIVE FLIGHT BRIEFING)     */}
+      {/* 🌟 FLIGHT OPERATIONAL IMPACT SUMMARY (EXECUTIVE BRIEFING)                 */}
       {/* ========================================================================= */}
       <div className={`rounded-2xl border p-5 shadow-2xl transition-all ${
         overallLevel === 'CRITICAL'
@@ -138,7 +138,7 @@ export default function NotamSection({ notamsData, icao, airportCoords }) {
             <div>
               <div className="flex flex-wrap items-center gap-2">
                 <span className="font-mono font-bold text-base tracking-wider uppercase text-white">
-                  RESUMEN DE IMPACTO OPERACIONAL EN VUELO
+                  FLIGHT OPERATIONAL IMPACT SUMMARY
                 </span>
                 <span className={`px-2 py-0.5 rounded text-[10px] font-mono font-bold tracking-wider uppercase border ${
                   overallLevel === 'CRITICAL'
@@ -147,17 +147,17 @@ export default function NotamSection({ notamsData, icao, airportCoords }) {
                       ? 'bg-amber-400 text-black border-amber-300'
                       : 'bg-emerald-400 text-black border-emerald-300'
                 }`}>
-                  {overallLevel === 'CRITICAL' ? 'ALTO IMPACTO' : overallLevel === 'HIGH' ? 'IMPACTO MODERADO' : 'BAJO IMPACTO'}
+                  {overallLevel === 'CRITICAL' ? 'HIGH IMPACT' : overallLevel === 'HIGH' ? 'MODERATE IMPACT' : 'LOW IMPACT'}
                 </span>
                 
                 {/* Time-window tag: Only today & next 3-4h */}
                 <span className="px-2 py-0.5 rounded text-[10px] font-mono bg-sky-500/15 text-sky-300 border border-sky-500/30 flex items-center gap-1">
                   <Clock className="w-3 h-3 text-sky-400" />
-                  VENTANA OPERACIONAL: AHORA + 4 HORAS
+                  OPERATIONAL WINDOW: NOW + 4 HOURS
                 </span>
               </div>
               <p className="text-xs text-slate-300 font-mono mt-0.5">
-                {operationalImpact?.headline || 'Evaluación automática de avisos que afectan a la operación del vuelo.'}
+                {operationalImpact?.headline || 'Automated evaluation of notices affecting flight operations.'}
               </p>
             </div>
           </div>
@@ -166,7 +166,7 @@ export default function NotamSection({ notamsData, icao, airportCoords }) {
             onClick={() => setShowExecutiveSummary(!showExecutiveSummary)}
             className="text-xs font-mono text-slate-400 hover:text-white flex items-center gap-1 self-end sm:self-center"
           >
-            <span>{showExecutiveSummary ? 'Plegar Resumen' : 'Desplegar Resumen'}</span>
+            <span>{showExecutiveSummary ? 'Collapse Summary' : 'Expand Summary'}</span>
             {showExecutiveSummary ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
           </button>
         </div>
@@ -189,7 +189,7 @@ export default function NotamSection({ notamsData, icao, airportCoords }) {
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-slate-400 text-[11px] uppercase flex items-center gap-1">
                     <Ban className="w-3.5 h-3.5 text-rose-400" />
-                    PISTAS
+                    RUNWAYS
                   </span>
                   <span className={`font-bold px-1.5 py-0.2 rounded text-[10px] ${
                     operationalImpact?.summaryStats?.closedRunwaysActiveCount > 0
@@ -199,23 +199,23 @@ export default function NotamSection({ notamsData, icao, airportCoords }) {
                         : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
                   }`}>
                     {operationalImpact?.summaryStats?.closedRunwaysActiveCount > 0
-                      ? `${operationalImpact.summaryStats.closedRunwaysActiveCount} CERRADAS AHORA`
+                      ? `${operationalImpact.summaryStats.closedRunwaysActiveCount} CLOSED NOW`
                       : operationalImpact?.summaryStats?.closedRunwaysUpcomingCount > 0
-                        ? `${operationalImpact.summaryStats.closedRunwaysUpcomingCount} PREVISTAS 3-4H`
-                        : 'OPERATIVAS'}
+                        ? `${operationalImpact.summaryStats.closedRunwaysUpcomingCount} EXPECTED 3-4H`
+                        : 'OPERATIONAL'}
                   </span>
                 </div>
                 <div className="text-sm font-bold text-white mt-1">
                   {operationalImpact?.summaryStats?.closedRunwaysActiveList?.length > 0
                     ? operationalImpact.summaryStats.closedRunwaysActiveList.join(', ')
                     : operationalImpact?.summaryStats?.closedRunwaysUpcomingList?.length > 0
-                      ? `Próx: ${operationalImpact.summaryStats.closedRunwaysUpcomingList.join(', ')}`
-                      : 'Sin cierres en ventana'}
+                      ? `Upcoming: ${operationalImpact.summaryStats.closedRunwaysUpcomingList.join(', ')}`
+                      : 'No closures in window'}
                 </div>
                 <p className="text-[10px] text-slate-400 mt-1">
                   {operationalImpact?.summaryStats?.closedRunwaysActiveCount > 0
-                    ? 'Excluir de cálculos EFB ahora'
-                    : 'Pistas abiertas para salida/llegada'}
+                    ? 'Exclude from EFB calculations now'
+                    : 'Runways open for departure/arrival'}
                 </p>
               </div>
 
@@ -228,23 +228,23 @@ export default function NotamSection({ notamsData, icao, airportCoords }) {
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-slate-400 text-[11px] uppercase flex items-center gap-1">
                     <Radio className="w-3.5 h-3.5 text-amber-400" />
-                    RADIOAYUDAS / ILS
+                    NAVAIDS / ILS
                   </span>
                   <span className={`font-bold px-1.5 py-0.2 rounded text-[10px] ${
                     operationalImpact?.summaryStats?.navaidOutagesCount > 0
                       ? 'bg-amber-400 text-black'
                       : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
                   }`}>
-                    {operationalImpact?.summaryStats?.navaidOutagesCount > 0 ? `${operationalImpact.summaryStats.navaidOutagesCount} AFECTADAS` : 'OPERATIVAS'}
+                    {operationalImpact?.summaryStats?.navaidOutagesCount > 0 ? `${operationalImpact.summaryStats.navaidOutagesCount} AFFECTED` : 'OPERATIONAL'}
                   </span>
                 </div>
                 <div className="text-sm font-bold text-white mt-1">
                   {operationalImpact?.summaryStats?.navaidOutagesCount > 0
-                    ? `${operationalImpact.summaryStats.navaidOutagesCount} fallos/pruebas activos`
-                    : 'Sistemas ILS/VOR operando'}
+                    ? `${operationalImpact.summaryStats.navaidOutagesCount} active outages/tests`
+                    : 'ILS/VOR systems operating'}
                 </div>
                 <p className="text-[10px] text-slate-400 mt-1">
-                  {operationalImpact?.summaryStats?.navaidOutagesCount > 0 ? 'Verificar aproximaciones RNP' : 'Aproximaciones de precisión OK'}
+                  {operationalImpact?.summaryStats?.navaidOutagesCount > 0 ? 'Verify RNP approaches' : 'Precision approaches OK'}
                 </p>
               </div>
 
@@ -257,23 +257,23 @@ export default function NotamSection({ notamsData, icao, airportCoords }) {
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-slate-400 text-[11px] uppercase flex items-center gap-1">
                     <Compass className="w-3.5 h-3.5 text-cockpit-cyan" />
-                    CALLES DE RODAJE
+                    TAXIWAYS
                   </span>
                   <span className={`font-bold px-1.5 py-0.2 rounded text-[10px] ${
                     operationalImpact?.summaryStats?.closedTaxiwaysActiveCount > 0
                       ? 'bg-amber-500/20 text-amber-300 border border-amber-500/40'
                       : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
                   }`}>
-                    {operationalImpact?.summaryStats?.closedTaxiwaysActiveCount > 0 ? `${operationalImpact.summaryStats.closedTaxiwaysActiveCount} CERRADAS` : 'SIN CIERRES'}
+                    {operationalImpact?.summaryStats?.closedTaxiwaysActiveCount > 0 ? `${operationalImpact.summaryStats.closedTaxiwaysActiveCount} CLOSED` : 'NO CLOSURES'}
                   </span>
                 </div>
                 <div className="text-sm font-bold text-white mt-1">
                   {operationalImpact?.summaryStats?.closedTaxiwaysActiveList?.length > 0
                     ? `TWY ${operationalImpact.summaryStats.closedTaxiwaysActiveList.slice(0, 4).join(', ')}`
-                    : 'Rodaje normal a plataforma'}
+                    : 'Normal taxiway operations'}
                 </div>
                 <p className="text-[10px] text-slate-400 mt-1">
-                  {operationalImpact?.summaryStats?.closedTaxiwaysActiveCount > 0 ? 'Prever instrucciones de desvío' : 'Circulación en tierra despejada'}
+                  {operationalImpact?.summaryStats?.closedTaxiwaysActiveCount > 0 ? 'Expect detour instructions' : 'Ground circulation clear'}
                 </p>
               </div>
 
@@ -286,23 +286,23 @@ export default function NotamSection({ notamsData, icao, airportCoords }) {
                 <div className="flex items-center justify-between mb-1">
                   <span className="text-slate-400 text-[11px] uppercase flex items-center gap-1">
                     <ShieldAlert className="w-3.5 h-3.5 text-rose-400" />
-                    ESPACIO AÉREO / TFR
+                    AIRSPACE / TFR
                   </span>
                   <span className={`font-bold px-1.5 py-0.2 rounded text-[10px] ${
                     operationalImpact?.summaryStats?.airspaceRestrictionsCount > 0
                       ? 'bg-rose-500 text-black'
                       : 'bg-emerald-500/20 text-emerald-400 border border-emerald-500/40'
                   }`}>
-                    {operationalImpact?.summaryStats?.airspaceRestrictionsCount > 0 ? `${operationalImpact.summaryStats.airspaceRestrictionsCount} ACTIVAS` : 'LIBRE'}
+                    {operationalImpact?.summaryStats?.airspaceRestrictionsCount > 0 ? `${operationalImpact.summaryStats.airspaceRestrictionsCount} ACTIVE` : 'CLEAR'}
                   </span>
                 </div>
                 <div className="text-sm font-bold text-white mt-1">
                   {operationalImpact?.summaryStats?.airspaceRestrictionsCount > 0
-                    ? 'Zonas restringidas activas'
-                    : 'Espacio aéreo sin TFR'}
+                    ? 'Active restricted zones'
+                    : 'Airspace without TFR'}
                 </div>
                 <p className="text-[10px] text-slate-400 mt-1">
-                  {operationalImpact?.summaryStats?.airspaceRestrictionsCount > 0 ? 'Verificar mapa delimitado' : 'Procedimientos estándar'}
+                  {operationalImpact?.summaryStats?.airspaceRestrictionsCount > 0 ? 'Verify demarcated map' : 'Standard procedures'}
                 </p>
               </div>
 
@@ -314,10 +314,10 @@ export default function NotamSection({ notamsData, icao, airportCoords }) {
                 <div className="flex items-center justify-between pb-1 border-b border-cockpit-border/50 text-xs font-mono">
                   <div className="flex items-center gap-2 font-bold text-slate-200 uppercase tracking-wider">
                     <ListChecks className="w-4 h-4 text-cockpit-cyan" />
-                    <span>ACCIONES Y RECOMENDACIONES CLAVE PARA LA TRIPULACIÓN</span>
+                    <span>KEY CREW ACTION ITEMS & RECOMMENDATIONS</span>
                   </div>
                   <span className="text-[10px] text-slate-400">
-                    Ventana: <strong>Vuelo actual & Próximas 3-4 horas</strong>
+                    Window: <strong>Current flight & Next 3-4 hours</strong>
                   </span>
                 </div>
 
@@ -362,7 +362,7 @@ export default function NotamSection({ notamsData, icao, airportCoords }) {
                 {/* Section header and Timing Subfilter buttons */}
                 <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-2 pt-1">
                   <div className="text-xs font-mono text-slate-400 uppercase tracking-wider flex items-center gap-2">
-                    <span>AVISOS CON REPERCUSIÓN DIRECTA EN ESTE VUELO ({filteredExecutiveImpacts.length}):</span>
+                    <span>DIRECT FLIGHT IMPACT NOTICES ({filteredExecutiveImpacts.length}):</span>
                   </div>
 
                   {/* Timing Filter buttons */}
@@ -375,7 +375,7 @@ export default function NotamSection({ notamsData, icao, airportCoords }) {
                           : 'text-slate-400 hover:text-white'
                       }`}
                     >
-                      TODOS ({operationalImpact.keyImpacts.length})
+                      ALL ({operationalImpact.keyImpacts.length})
                     </button>
                     <button
                       onClick={() => setTimingFilter('ACTIVE_ONLY')}
@@ -386,7 +386,7 @@ export default function NotamSection({ notamsData, icao, airportCoords }) {
                       }`}
                     >
                       <span className="w-1.5 h-1.5 rounded-full bg-rose-400"></span>
-                      ACTIVOS AHORA ({activeNowCount})
+                      ACTIVE NOW ({activeNowCount})
                     </button>
                     {upcomingCount > 0 && (
                       <button
@@ -398,7 +398,7 @@ export default function NotamSection({ notamsData, icao, airportCoords }) {
                         }`}
                       >
                         <Clock className="w-3 h-3 text-amber-400" />
-                        PRÓXIMAMENTE 3-4H ({upcomingCount})
+                        UPCOMING 3-4H ({upcomingCount})
                       </button>
                     )}
                   </div>
@@ -452,7 +452,7 @@ export default function NotamSection({ notamsData, icao, airportCoords }) {
                               </span>
 
                               <span className="text-[10px] text-slate-500 group-hover:text-cockpit-cyan flex items-center gap-0.5 transition-colors pl-1">
-                                <span>Abrir</span>
+                                <span>Open</span>
                                 <ChevronRight className="w-3 h-3" />
                               </span>
                             </div>
@@ -485,7 +485,7 @@ export default function NotamSection({ notamsData, icao, airportCoords }) {
       </div>
 
       {/* ========================================================================= */}
-      {/* 📋 LISTA COMPLETA DE NOTAMs Y FILTRADO POR CATEGORÍA                      */}
+      {/* 📋 COMPLETE NOTAM NOTICES LIST & CATEGORY FILTERING                       */}
       {/* ========================================================================= */}
       <div className="bg-cockpit-900 border border-cockpit-border rounded-xl p-5 shadow-lg space-y-4">
         
@@ -495,11 +495,11 @@ export default function NotamSection({ notamsData, icao, airportCoords }) {
             <div className="flex items-center gap-2">
               <FileText className="w-5 h-5 text-cockpit-cyan" />
               <h2 className="font-mono font-bold text-base tracking-wider uppercase text-white">
-                LISTADO DETALLADO DE AVISOS NOTAM ({summary?.total || 0})
+                DETAILED NOTAM NOTICES LIST ({summary?.total || 0})
               </h2>
             </div>
             <p className="text-xs text-slate-400 mt-1 font-mono">
-              Visualice, filtre y consulte todos los avisos oficiales emitidos
+              Inspect, filter, and review all published official notices
             </p>
           </div>
 
@@ -515,7 +515,7 @@ export default function NotamSection({ notamsData, icao, airportCoords }) {
                 }`}
               >
                 <Sparkles className="w-3.5 h-3.5" />
-                <span>LENGUAJE CLARO</span>
+                <span>PLAIN LANGUAGE</span>
               </button>
               <button
                 onClick={() => setViewMode('RAW')}
@@ -544,7 +544,7 @@ export default function NotamSection({ notamsData, icao, airportCoords }) {
                   : 'bg-cockpit-950 border-cockpit-border text-slate-400 hover:text-white'
               }`}
             >
-              TODOS ({summary?.total || 0})
+              ALL ({summary?.total || 0})
             </button>
 
             {summary?.runwayAlerts > 0 && (
@@ -556,7 +556,7 @@ export default function NotamSection({ notamsData, icao, airportCoords }) {
                     : 'bg-cockpit-950 border-cockpit-border text-rose-400 hover:text-rose-300'
                 }`}
               >
-                PISTAS ({summary.runwayAlerts})
+                RUNWAYS ({summary.runwayAlerts})
               </button>
             )}
 
@@ -569,7 +569,7 @@ export default function NotamSection({ notamsData, icao, airportCoords }) {
                     : 'bg-cockpit-950 border-cockpit-border text-amber-400 hover:text-amber-300'
                 }`}
               >
-                RODAJE ({summary.taxiwayAlerts})
+                TAXIWAYS ({summary.taxiwayAlerts})
               </button>
             )}
 
@@ -582,7 +582,7 @@ export default function NotamSection({ notamsData, icao, airportCoords }) {
                     : 'bg-cockpit-950 border-cockpit-border text-yellow-400 hover:text-yellow-300'
                 }`}
               >
-                LUCES ({summary.lightingAlerts})
+                LIGHTING ({summary.lightingAlerts})
               </button>
             )}
 
@@ -595,7 +595,7 @@ export default function NotamSection({ notamsData, icao, airportCoords }) {
                     : 'bg-cockpit-950 border-cockpit-border text-purple-400 hover:text-purple-300'
                 }`}
               >
-                OBSTÁCULOS ({summary.obstacleAlerts})
+                OBSTACLES ({summary.obstacleAlerts})
               </button>
             )}
 
@@ -608,7 +608,7 @@ export default function NotamSection({ notamsData, icao, airportCoords }) {
                     : 'bg-cockpit-950 border-cockpit-border text-sky-400 hover:text-sky-300'
                 }`}
               >
-                RADIOAYUDAS ({summary.navaidAlerts})
+                NAVAIDS ({summary.navaidAlerts})
               </button>
             )}
 
@@ -621,7 +621,7 @@ export default function NotamSection({ notamsData, icao, airportCoords }) {
                     : 'bg-cockpit-950 border-cockpit-border text-red-400 hover:text-red-300'
                 }`}
               >
-                ESPACIO AÉREO ({summary.airspaceAlerts})
+                AIRSPACE ({summary.airspaceAlerts})
               </button>
             )}
           </div>
@@ -633,7 +633,7 @@ export default function NotamSection({ notamsData, icao, airportCoords }) {
               type="text"
               value={searchQuery}
               onChange={(e) => setSearchQuery(e.target.value)}
-              placeholder="Buscar en NOTAMs..."
+              placeholder="Search NOTAMs..."
               className="w-full pl-8 pr-3 py-1.5 bg-cockpit-950 border border-cockpit-border rounded-lg text-xs font-mono text-white placeholder-slate-500 focus:outline-none focus:border-cockpit-cyan"
             />
           </div>
@@ -643,7 +643,7 @@ export default function NotamSection({ notamsData, icao, airportCoords }) {
         <div className="space-y-3">
           {filteredNotams.length === 0 ? (
             <div className="p-8 text-center bg-cockpit-950 rounded-xl border border-cockpit-border text-slate-400 font-mono text-xs">
-              No se encontraron NOTAMs con el filtro o término especificado.
+              No NOTAMs found matching the specified filter or query.
             </div>
           ) : (
             filteredNotams.map((notam) => {
@@ -696,12 +696,12 @@ export default function NotamSection({ notamsData, icao, airportCoords }) {
                     <div className="flex flex-col sm:flex-row sm:items-center gap-1.5 sm:gap-2 text-[11px] font-mono text-slate-400">
                       <div className="flex flex-wrap items-center gap-1.5">
                         <span>
-                          DESDE: <strong className="text-slate-200">{notam.startDateFormatted || formatNotamDate(notam.startDate)}</strong>
+                          FROM: <strong className="text-slate-200">{notam.startDateFormatted || formatNotamDate(notam.startDate)}</strong>
                         </span>
                         <span className="hidden sm:inline text-slate-600">•</span>
                         <span>
-                          HASTA: <strong className={notam.isPermanent ? 'text-amber-400 font-bold' : 'text-slate-200'}>
-                            {notam.isPermanent ? 'PERMANENTE' : (notam.endDateFormatted || formatNotamDate(notam.endDate))}
+                          TO: <strong className={notam.isPermanent ? 'text-amber-400 font-bold' : 'text-slate-200'}>
+                            {notam.isPermanent ? 'PERMANENT' : (notam.endDateFormatted || formatNotamDate(notam.endDate))}
                           </strong>
                         </span>
                       </div>
@@ -711,7 +711,7 @@ export default function NotamSection({ notamsData, icao, airportCoords }) {
                           handleCopy(notam.id, notam.rawText);
                         }}
                         className="p-1 text-slate-400 hover:text-white self-end sm:self-center"
-                        title="Copiar NOTAM completo"
+                        title="Copy full NOTAM"
                       >
                         {copiedId === notam.id ? <Check className="w-3.5 h-3.5 text-emerald-400" /> : <Copy className="w-3.5 h-3.5" />}
                       </button>
@@ -741,13 +741,13 @@ export default function NotamSection({ notamsData, icao, airportCoords }) {
                         }}
                         className="text-slate-400 hover:text-cockpit-cyan flex items-center gap-1"
                       >
-                        <span>{isExpanded ? 'Ocultar formato RAW ICAO' : 'Ver formato RAW ICAO'}</span>
+                        <span>{isExpanded ? 'Hide RAW ICAO format' : 'View RAW ICAO format'}</span>
                         {isExpanded ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
                       </button>
                     ) : <span />}
 
                     <div className="text-slate-500 group-hover:text-cockpit-cyan flex items-center gap-1 transition-colors font-medium">
-                      <span>Abrir mapa e info</span>
+                      <span>Open map & details</span>
                       <ChevronRight className="w-3.5 h-3.5" />
                     </div>
                   </div>

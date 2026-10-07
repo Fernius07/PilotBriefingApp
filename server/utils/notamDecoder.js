@@ -97,25 +97,25 @@ const NOTAM_CONTRACTIONS = {
 
 // Common Q-codes to classify NOTAM and human meaning
 const Q_CODES = {
-  'QMRLC': { category: 'RUNWAY', severity: 'CRITICAL', label: 'Cierre de Pista' },
-  'QMRXX': { category: 'RUNWAY', severity: 'WARNING', label: 'Condiciones de Pista' },
-  'QMXLC': { category: 'TAXIWAY', severity: 'WARNING', label: 'Calle de Rodaje Cerrada' },
-  'QMXLT': { category: 'TAXIWAY', severity: 'CAUTION', label: 'Rodaje con Limitaciones' },
-  'QMXXX': { category: 'TAXIWAY', severity: 'CAUTION', label: 'Trabajos en Rodaje' },
-  'QOLAS': { category: 'OBSTACLE', severity: 'WARNING', label: 'Obstáculo / Baliza de Grúa' },
-  'QOBCE': { category: 'OBSTACLE', severity: 'WARNING', label: 'Grúa / Obstáculo Erigido' },
-  'QICAS': { category: 'NAVAID', severity: 'WARNING', label: 'ILS Fuera de Servicio (U/S)' },
-  'QILAS': { category: 'NAVAID', severity: 'WARNING', label: 'Localizador ILS U/S' },
-  'QIGAS': { category: 'NAVAID', severity: 'WARNING', label: 'Senda de Planeo ILS U/S' },
-  'QNVAS': { category: 'NAVAID', severity: 'WARNING', label: 'VOR Fuera de Servicio' },
-  'QNDAS': { category: 'NAVAID', severity: 'CAUTION', label: 'DME Fuera de Servicio' },
-  'QLCAS': { category: 'LIGHTING', severity: 'WARNING', label: 'Luces de Pista Inoperativas' },
-  'QLPAS': { category: 'LIGHTING', severity: 'CAUTION', label: 'PAPI Inoperativo' },
-  'QLAAS': { category: 'LIGHTING', severity: 'WARNING', label: 'Luces de Aproximación ALS U/S' },
-  'QFAXX': { category: 'GENERAL', severity: 'INFO', label: 'Información de Aeródromo' },
-  'QFAAH': { category: 'GENERAL', severity: 'INFO', label: 'Horario Operacional de Aeródromo' },
-  'QRTCA': { category: 'AIRSPACE', severity: 'CRITICAL', label: 'Zona Restringida Temporal (TFR)' },
-  'QRRCA': { category: 'AIRSPACE', severity: 'WARNING', label: 'Espacio Aéreo Restringido Activo' },
+  'QMRLC': { category: 'RUNWAY', severity: 'CRITICAL', label: 'Runway Closed' },
+  'QMRXX': { category: 'RUNWAY', severity: 'WARNING', label: 'Runway Conditions' },
+  'QMXLC': { category: 'TAXIWAY', severity: 'WARNING', label: 'Taxiway Closed' },
+  'QMXLT': { category: 'TAXIWAY', severity: 'CAUTION', label: 'Taxiway with Restrictions' },
+  'QMXXX': { category: 'TAXIWAY', severity: 'CAUTION', label: 'Taxiway Works in Progress' },
+  'QOLAS': { category: 'OBSTACLE', severity: 'WARNING', label: 'Obstacle / Crane Beacon' },
+  'QOBCE': { category: 'OBSTACLE', severity: 'WARNING', label: 'Crane / Obstacle Erected' },
+  'QICAS': { category: 'NAVAID', severity: 'WARNING', label: 'ILS Out of Service (U/S)' },
+  'QILAS': { category: 'NAVAID', severity: 'WARNING', label: 'ILS Localizer U/S' },
+  'QIGAS': { category: 'NAVAID', severity: 'WARNING', label: 'ILS Glidepath U/S' },
+  'QNVAS': { category: 'NAVAID', severity: 'WARNING', label: 'VOR Out of Service' },
+  'QNDAS': { category: 'NAVAID', severity: 'CAUTION', label: 'DME Out of Service' },
+  'QLCAS': { category: 'LIGHTING', severity: 'WARNING', label: 'Runway Lights Inoperative' },
+  'QLPAS': { category: 'LIGHTING', severity: 'CAUTION', label: 'PAPI Inoperative' },
+  'QLAAS': { category: 'LIGHTING', severity: 'WARNING', label: 'ALS Approach Lights U/S' },
+  'QFAXX': { category: 'GENERAL', severity: 'INFO', label: 'Aerodrome Information' },
+  'QFAAH': { category: 'GENERAL', severity: 'INFO', label: 'Aerodrome Operating Hours' },
+  'QRTCA': { category: 'AIRSPACE', severity: 'CRITICAL', label: 'Temporary Flight Restriction (TFR)' },
+  'QRRCA': { category: 'AIRSPACE', severity: 'WARNING', label: 'Active Restricted Airspace' },
 };
 
 /**
@@ -142,7 +142,7 @@ function classifyNotam(rawText, qCode = '') {
     textUpper.includes('AD CLSD') ||
     textUpper.includes('AERODROME CLOSED')
   ) {
-    return { category: 'RUNWAY', severity: 'CRITICAL', label: 'Cierre de Pista / Aeródromo' };
+    return { category: 'RUNWAY', severity: 'CRITICAL', label: 'Runway / Aerodrome Closure' };
   }
 
   // 3. Airspace / Restrictions / TFR (Checked before general words)
@@ -154,7 +154,7 @@ function classifyNotam(rawText, qCode = '') {
     textUpper.includes('DANGER AREA') ||
     textUpper.includes('ZONA RESTRINGIDA')
   ) {
-    return { category: 'AIRSPACE', severity: 'CRITICAL', label: 'Restricción de Espacio Aéreo' };
+    return { category: 'AIRSPACE', severity: 'CRITICAL', label: 'Airspace Restriction / TFR' };
   }
 
   // 4. Navaids / Instrument Procedures Outages
@@ -170,7 +170,7 @@ function classifyNotam(rawText, qCode = '') {
     return {
       category: 'NAVAID',
       severity: isUs ? 'WARNING' : 'CAUTION',
-      label: isUs ? 'Radioayuda Fuera de Servicio (U/S)' : 'Radioayuda / Procedimiento'
+      label: isUs ? 'Navaid Out of Service (U/S)' : 'Navaid / Procedure Notice'
     };
   }
 
@@ -180,7 +180,7 @@ function classifyNotam(rawText, qCode = '') {
     return {
       category: 'RUNWAY',
       severity: isWip ? 'WARNING' : 'CAUTION',
-      label: isWip ? 'Obras / Trabajos en Pista' : 'Aviso de Pista'
+      label: isWip ? 'Runway Works / Maintenance' : 'Runway Advisory'
     };
   }
 
@@ -190,7 +190,7 @@ function classifyNotam(rawText, qCode = '') {
     return {
       category: 'TAXIWAY',
       severity: isClosed ? 'WARNING' : 'CAUTION',
-      label: isClosed ? 'Calle de Rodaje Cerrada' : 'Restricción de Rodaje'
+      label: isClosed ? 'Taxiway Closed' : 'Taxiway Restriction'
     };
   }
 
@@ -204,16 +204,16 @@ function classifyNotam(rawText, qCode = '') {
     return { 
       category: 'LIGHTING', 
       severity: isUs ? 'WARNING' : 'CAUTION', 
-      label: isUs ? 'Fallo de Luces / PAPI Inoperativo' : 'Mantenimiento de Luces' 
+      label: isUs ? 'Lighting Outage / PAPI Inoperative' : 'Lighting Maintenance' 
     };
   }
 
   // 8. Obstacles & Cranes
   if (textUpper.includes('OBST') || textUpper.includes('CRANE') || textUpper.includes('MAST') || textUpper.includes('GRÚA')) {
-    return { category: 'OBSTACLE', severity: 'CAUTION', label: 'Obstáculo / Grúa en la Zona' };
+    return { category: 'OBSTACLE', severity: 'CAUTION', label: 'Obstacle / Crane in Area' };
   }
 
-  return { category: 'GENERAL', severity: 'INFO', label: 'Información General' };
+  return { category: 'GENERAL', severity: 'INFO', label: 'General Information' };
 }
 
 /**
@@ -283,7 +283,7 @@ function formatNotamDate(dateStr) {
   if (!dateStr) return '';
   const cleanStr = String(dateStr).trim();
   if (cleanStr === 'PERM' || cleanStr.includes('UFN') || cleanStr.toUpperCase() === 'PERMANENT') {
-    return 'PERMANENTE';
+    return 'PERMANENT';
   }
 
   const dateObj = parseNotamDate(cleanStr);
@@ -317,7 +317,7 @@ function evaluateTimingStatus(startDateStr, endDateStr, isPerm, now = new Date()
       return { 
         status: 'ACTIVE_NOW', 
         isUpcoming: false, 
-        label: 'ACTIVO AHORA', 
+        label: 'ACTIVE NOW', 
         badgeColor: 'emerald',
         priority: 1 
       };
@@ -329,7 +329,7 @@ function evaluateTimingStatus(startDateStr, endDateStr, isPerm, now = new Date()
       return { 
         status: 'ACTIVE_NOW', 
         isUpcoming: false, 
-        label: 'ACTIVO AHORA', 
+        label: 'ACTIVE NOW', 
         badgeColor: 'emerald',
         priority: 1 
       };
@@ -337,7 +337,7 @@ function evaluateTimingStatus(startDateStr, endDateStr, isPerm, now = new Date()
       return { 
         status: 'EXPIRED', 
         isUpcoming: false, 
-        label: 'EXPIRADO', 
+        label: 'EXPIRED', 
         badgeColor: 'slate',
         priority: 9 
       };
@@ -352,7 +352,7 @@ function evaluateTimingStatus(startDateStr, endDateStr, isPerm, now = new Date()
     return {
       status: 'UPCOMING_SOON',
       isUpcoming: true,
-      label: `PRÓXIMAMENTE (en ${timeUntilStr})`,
+      label: `UPCOMING (in ${timeUntilStr})`,
       timeUntilMinutes: Math.round(diffMs / 60000),
       timeUntilStr,
       badgeColor: 'amber',
@@ -363,7 +363,7 @@ function evaluateTimingStatus(startDateStr, endDateStr, isPerm, now = new Date()
   return { 
     status: 'FUTURE', 
     isUpcoming: false, 
-    label: 'FUTURO (> 4h)', 
+    label: 'FUTURE (> 4h)', 
     badgeColor: 'slate',
     priority: 8 
   };
@@ -464,7 +464,7 @@ function extractGeoData(rawText = '', mapPointer = null) {
       return {
         hasGeo: true,
         shape: 'POLYGON',
-        shapeLabel: 'Zona Acotada (Polígono)',
+        shapeLabel: 'Bounded Area (Polygon)',
         polygonPoints,
         lat: centroidLat,
         lon: centroidLon,
@@ -474,7 +474,7 @@ function extractGeoData(rawText = '', mapPointer = null) {
         lowerLimit,
         upperLimit,
         locationName,
-        coordText: `${polygonPoints.length} vértices (Área Delimitada)`
+        coordText: `${polygonPoints.length} vertices (Delimited Area)`
       };
     }
   }
@@ -539,7 +539,7 @@ function extractGeoData(rawText = '', mapPointer = null) {
     return {
       hasGeo: true,
       shape: 'CIRCLE',
-      shapeLabel: 'Punto y Radio de Alcance',
+      shapeLabel: 'Specific Point & Nautical Radius',
       lat: primaryLat,
       lon: primaryLon,
       radiusMeters: explicitRadiusMeters,
@@ -555,7 +555,7 @@ function extractGeoData(rawText = '', mapPointer = null) {
   return {
     hasGeo: true,
     shape: 'POINT',
-    shapeLabel: 'Punto Concreto',
+    shapeLabel: 'Single Concrete Point',
     lat: primaryLat,
     lon: primaryLon,
     radiusMeters: null,
@@ -647,7 +647,7 @@ function buildOperationalSummary(processedNotams = [], icao = '', now = new Date
       const rwyIdent = rwyMatch ? rwyMatch[1].toUpperCase() : null;
 
       if (n.severity === 'CRITICAL' || textUpper.includes('CLSD') || textUpper.includes('CLOSED')) {
-        const title = rwyIdent ? `Pista ${rwyIdent} CERRADA` : `Pista de aterrizaje/despegue cerrada`;
+        const title = rwyIdent ? `Runway ${rwyIdent} CLOSED` : `Runway CLOSED`;
         if (rwyIdent) {
           if (isUpcoming) closedRunwaysUpcoming.add(rwyIdent);
           else closedRunwaysActive.add(rwyIdent);
@@ -659,18 +659,18 @@ function buildOperationalSummary(processedNotams = [], icao = '', now = new Date
           severity: isUpcoming ? 'WARNING' : 'CRITICAL',
           isUpcoming,
           timingLabel: n.timing.label,
-          affectedItem: rwyIdent ? `RWY ${rwyIdent}` : 'PISTA',
-          title: isUpcoming ? `[PRÓXIMAMENTE] ${title}` : title,
+          affectedItem: rwyIdent ? `RWY ${rwyIdent}` : 'RUNWAY',
+          title: isUpcoming ? `[UPCOMING] ${title}` : title,
           description: plain,
           crewAdvice: isUpcoming
-            ? `Cierre programado en ${n.timing.timeUntilStr || '3h'}. Si su llegada o salida coincide con ese horario, recalcular para pista alternativa.`
-            : 'Pista cerrada en este momento. Excluir de cálculos de rendimiento EFB de despegue y aterrizaje.',
+            ? `Scheduled closure in ${n.timing.timeUntilStr || '3h'}. If arrival/departure window coincides, recalculate performance for alternate runway.`
+            : 'Runway closed at this time. Exclude from EFB takeoff and landing performance calculations.',
           notamNumber: n.number || n.id,
           startDate: n.startDate,
           endDate: n.endDate,
           startDateFormatted: formatNotamDate(n.startDate),
           endDateFormatted: formatNotamDate(n.endDate),
-          validity: `${formatNotamDate(n.startDate)} al ${formatNotamDate(n.endDate)}`,
+          validity: `${formatNotamDate(n.startDate)} to ${formatNotamDate(n.endDate)}`,
           rawText: n.rawText,
           plainText: n.plainText,
           geo: n.geo || null
@@ -682,16 +682,16 @@ function buildOperationalSummary(processedNotams = [], icao = '', now = new Date
           severity: isUpcoming ? 'CAUTION' : n.severity,
           isUpcoming,
           timingLabel: n.timing.label,
-          affectedItem: rwyIdent ? `RWY ${rwyIdent}` : 'PISTA',
-          title: rwyIdent ? `Restricción en Pista ${rwyIdent}` : `Trabajos o restricciones en pista`,
+          affectedItem: rwyIdent ? `RWY ${rwyIdent}` : 'RUNWAY',
+          title: rwyIdent ? `Restriction on Runway ${rwyIdent}` : `Runway Works / Restriction`,
           description: plain,
-          crewAdvice: 'Precaución en pista. Revisar distancias declaradas y estado de superficie.',
+          crewAdvice: 'Caution on runway. Review declared distances and surface conditions.',
           notamNumber: n.number || n.id,
           startDate: n.startDate,
           endDate: n.endDate,
           startDateFormatted: formatNotamDate(n.startDate),
           endDateFormatted: formatNotamDate(n.endDate),
-          validity: `${formatNotamDate(n.startDate)} al ${formatNotamDate(n.endDate)}`,
+          validity: `${formatNotamDate(n.startDate)} to ${formatNotamDate(n.endDate)}`,
           rawText: n.rawText,
           plainText: n.plainText,
           geo: n.geo || null
@@ -705,16 +705,16 @@ function buildOperationalSummary(processedNotams = [], icao = '', now = new Date
       const rwyMatch = textUpper.match(/(?:RWY|RUNWAY)\s*(\d{1,2}[LRC]?)/i);
       const rwy = rwyMatch ? `RWY ${rwyMatch[1]}` : '';
 
-      let navaidName = 'Radioayuda';
+      let navaidName = 'Navaid';
       if (textUpper.includes('ILS')) navaidName = `ILS ${rwy}`.trim();
-      else if (textUpper.includes('GLIDEPATH') || textUpper.includes('GP')) navaidName = `Senda de Planeo (GP) ${rwy}`.trim();
-      else if (textUpper.includes('LOCALIZER') || textUpper.includes('LLZ') || textUpper.includes('LOC')) navaidName = `Localizador (LOC) ${rwy}`.trim();
+      else if (textUpper.includes('GLIDEPATH') || textUpper.includes('GP')) navaidName = `Glidepath (GP) ${rwy}`.trim();
+      else if (textUpper.includes('LOCALIZER') || textUpper.includes('LLZ') || textUpper.includes('LOC')) navaidName = `Localizer (LOC) ${rwy}`.trim();
       else if (textUpper.includes('DVOR') || textUpper.includes('VOR')) navaidName = 'VOR';
       else if (textUpper.includes('DME')) navaidName = 'DME';
 
       const title = isOutage 
-        ? `${navaidName} NO DISPONIBLE (U/S)` 
-        : `Aviso operacional de ${navaidName}`;
+        ? `${navaidName} OUT OF SERVICE (U/S)` 
+        : `Operational Advisory for ${navaidName}`;
 
       impacts.push({
         id: n.id,
@@ -723,19 +723,19 @@ function buildOperationalSummary(processedNotams = [], icao = '', now = new Date
         isUpcoming,
         timingLabel: n.timing.label,
         affectedItem: navaidName,
-        title: isUpcoming ? `[PRÓXIMAMENTE] ${title}` : title,
+        title: isUpcoming ? `[UPCOMING] ${title}` : title,
         description: plain,
         crewAdvice: isOutage 
           ? (isUpcoming 
-              ? `Fuera de servicio a partir de ${n.timing.timeUntilStr || '3h'}. Prever mínimos más altos para llegadas posteriores.`
-              : 'No usar para aproximaciones de precisión. Prever aproximación RNP/VOR o aumentar mínimos de visibilidad.')
-          : 'Verificar estado de calibración antes de la aproximación.',
+              ? `Out of service starting in ${n.timing.timeUntilStr || '3h'}. Expect higher approach minima for later arrivals.`
+              : 'Do not use for precision approaches. Plan RNP/VOR approach or increase visibility minima.')
+          : 'Verify calibration status prior to approach.',
         notamNumber: n.number || n.id,
         startDate: n.startDate,
         endDate: n.endDate,
         startDateFormatted: formatNotamDate(n.startDate),
         endDateFormatted: formatNotamDate(n.endDate),
-        validity: `${formatNotamDate(n.startDate)} al ${formatNotamDate(n.endDate)}`,
+        validity: `${formatNotamDate(n.startDate)} to ${formatNotamDate(n.endDate)}`,
         rawText: n.rawText,
         plainText: n.plainText,
         geo: n.geo || null
@@ -746,7 +746,7 @@ function buildOperationalSummary(processedNotams = [], icao = '', now = new Date
     // 3. TAXIWAY & APRON RESTRICTIONS
     else if (n.category === 'TAXIWAY') {
       const twyMatch = textUpper.match(/(?:TWY|TAXIWAY)\s*([A-Z0-9]+)/i);
-      const twyIdent = twyMatch ? twyMatch[1].toUpperCase() : 'RODAJE';
+      const twyIdent = twyMatch ? twyMatch[1].toUpperCase() : 'TAXIWAY';
 
       const isClosed = textUpper.includes('CLSD') || textUpper.includes('CLOSED');
       if (isClosed) {
@@ -762,16 +762,16 @@ function buildOperationalSummary(processedNotams = [], icao = '', now = new Date
         timingLabel: n.timing.label,
         affectedItem: `TWY ${twyIdent}`,
         title: isClosed 
-          ? (isUpcoming ? `[PRÓXIMAMENTE] Calle ${twyIdent} CERRADA` : `Calle ${twyIdent} CERRADA`)
-          : `Restricción en Calle ${twyIdent}`,
+          ? (isUpcoming ? `[UPCOMING] Taxiway ${twyIdent} CLOSED` : `Taxiway ${twyIdent} CLOSED`)
+          : `Restriction on Taxiway ${twyIdent}`,
         description: plain,
-        crewAdvice: 'Planificar ruta de rodaje con ATC evitando los tramos cerrados.',
+        crewAdvice: 'Plan taxi route with ATC avoiding closed segments.',
         notamNumber: n.number || n.id,
         startDate: n.startDate,
         endDate: n.endDate,
         startDateFormatted: formatNotamDate(n.startDate),
         endDateFormatted: formatNotamDate(n.endDate),
-        validity: `${formatNotamDate(n.startDate)} al ${formatNotamDate(n.endDate)}`,
+        validity: `${formatNotamDate(n.startDate)} to ${formatNotamDate(n.endDate)}`,
         rawText: n.rawText,
         plainText: n.plainText,
         geo: n.geo || null
@@ -782,7 +782,7 @@ function buildOperationalSummary(processedNotams = [], icao = '', now = new Date
     else if (n.category === 'LIGHTING') {
       const isPapi = textUpper.includes('PAPI');
       const isAls = textUpper.includes('ALS') || textUpper.includes('APPROACH LIGHT');
-      const affectedItem = isPapi ? 'PAPI' : isAls ? 'ALS' : 'LUCES';
+      const affectedItem = isPapi ? 'PAPI' : isAls ? 'ALS' : 'LIGHTS';
 
       impacts.push({
         id: n.id,
@@ -791,17 +791,17 @@ function buildOperationalSummary(processedNotams = [], icao = '', now = new Date
         isUpcoming,
         timingLabel: n.timing.label,
         affectedItem,
-        title: isUpcoming ? `[PRÓXIMAMENTE] Fallo en ${affectedItem}` : `Fallo / Mantenimiento en ${affectedItem}`,
+        title: isUpcoming ? `[UPCOMING] Outage on ${affectedItem}` : `Failure / Maintenance on ${affectedItem}`,
         description: plain,
         crewAdvice: isPapi 
-          ? 'Guía visual de senda de planeo inoperativa. Prever senda barométrica o ILS.' 
-          : 'Mínimos de visibilidad de aproximación pueden verse incrementados.',
+          ? 'Visual glidepath guidance inoperative. Plan barometric or ILS approach.' 
+          : 'Approach visibility minima may be increased.',
         notamNumber: n.number || n.id,
         startDate: n.startDate,
         endDate: n.endDate,
         startDateFormatted: formatNotamDate(n.startDate),
         endDateFormatted: formatNotamDate(n.endDate),
-        validity: `${formatNotamDate(n.startDate)} al ${formatNotamDate(n.endDate)}`,
+        validity: `${formatNotamDate(n.startDate)} to ${formatNotamDate(n.endDate)}`,
         rawText: n.rawText,
         plainText: n.plainText,
         geo: n.geo || null
@@ -817,16 +817,16 @@ function buildOperationalSummary(processedNotams = [], icao = '', now = new Date
         severity: isUpcoming ? 'WARNING' : 'CRITICAL',
         isUpcoming,
         timingLabel: n.timing.label,
-        affectedItem: 'ESPACIO AÉREO',
-        title: isUpcoming ? '[PRÓXIMAMENTE] Zona Restringida Temporal (TFR)' : 'Zona Restringida Temporal (TFR) Activa',
+        affectedItem: 'AIRSPACE',
+        title: isUpcoming ? '[UPCOMING] Temporary Flight Restriction (TFR)' : 'Temporary Flight Restriction (TFR) Active',
         description: plain,
-        crewAdvice: 'Evitar el volumen de espacio aéreo delimitado. Cumplir instrucciones de control ATC.',
+        crewAdvice: 'Avoid delimited airspace volume. Comply strictly with ATC instructions.',
         notamNumber: n.number || n.id,
         startDate: n.startDate,
         endDate: n.endDate,
         startDateFormatted: formatNotamDate(n.startDate),
         endDateFormatted: formatNotamDate(n.endDate),
-        validity: `${formatNotamDate(n.startDate)} al ${formatNotamDate(n.endDate)}`,
+        validity: `${formatNotamDate(n.startDate)} to ${formatNotamDate(n.endDate)}`,
         rawText: n.rawText,
         plainText: n.plainText,
         geo: n.geo || null
@@ -846,16 +846,16 @@ function buildOperationalSummary(processedNotams = [], icao = '', now = new Date
         severity: 'CAUTION',
         isUpcoming,
         timingLabel: n.timing.label,
-        affectedItem: 'GRÚA / OBSTÁCULO',
-        title: `Obstáculo / Grúa en Proximidades ${height ? `(${height})` : ''}`,
+        affectedItem: 'CRANE / OBSTACLE',
+        title: `Obstacle / Crane in Vicinity ${height ? `(${height})` : ''}`,
         description: plain,
-        crewAdvice: 'Mantener vigilancia visual de obstáculos en maniobras visuales y circuito de tránsito.',
+        crewAdvice: 'Maintain visual vigilance for obstacles during visual maneuvers and traffic circuit.',
         notamNumber: n.number || n.id,
         startDate: n.startDate,
         endDate: n.endDate,
         startDateFormatted: formatNotamDate(n.startDate),
         endDateFormatted: formatNotamDate(n.endDate),
-        validity: `${formatNotamDate(n.startDate)} al ${formatNotamDate(n.endDate)}`,
+        validity: `${formatNotamDate(n.startDate)} to ${formatNotamDate(n.endDate)}`,
         rawText: n.rawText,
         plainText: n.plainText,
         geo: n.geo || null
@@ -882,25 +882,25 @@ function buildOperationalSummary(processedNotams = [], icao = '', now = new Date
     overallLevel = 'MODERATE';
   }
 
-  // Headline in Spanish
-  let headline = 'Operaciones normales en este momento sin cierres críticos inmediatos.';
+  // Headline in English
+  let headline = 'Normal operations at this time with no immediate critical closures.';
   if (closedRunwaysActive.size > 0) {
-    headline = `¡ATENCIÓN! Pistas cerradas en este momento: ${Array.from(closedRunwaysActive).join(', ')}.`;
+    headline = `WARNING! Runways closed at this time: ${Array.from(closedRunwaysActive).join(', ')}.`;
   } else if (closedRunwaysUpcoming.size > 0) {
-    headline = `Pistas operativas ahora. Cierre previsto en próximas horas: ${Array.from(closedRunwaysUpcoming).join(', ')}.`;
+    headline = `Runways currently operational. Scheduled closure in upcoming hours: ${Array.from(closedRunwaysUpcoming).join(', ')}.`;
   } else if (navaidOutages.length > 0) {
-    headline = `Restricciones en radioayudas activas: ${navaidOutages.slice(0, 3).join(', ')} fuera de servicio.`;
+    headline = `Active navaid restrictions: ${navaidOutages.slice(0, 3).join(', ')} out of service.`;
   } else if (closedTaxiwaysActive.size > 0) {
-    headline = `Calles de rodaje cerradas activas: ${Array.from(closedTaxiwaysActive).slice(0, 4).join(', ')}.`;
+    headline = `Active taxiway closures: ${Array.from(closedTaxiwaysActive).slice(0, 4).join(', ')}.`;
   }
 
-  // Build Crew Checklist bullet points
+  // Build Crew Checklist bullet points in English
   if (closedRunwaysActive.size > 0) {
     checklist.push({
       icon: 'ban',
       level: 'CRITICAL',
       timing: 'NOW',
-      text: `[ACTIVO AHORA] Pistas no disponibles: ${Array.from(closedRunwaysActive).join(', ')}. Excluir de cálculos EFB.`
+      text: `[ACTIVE NOW] Unavailable runways: ${Array.from(closedRunwaysActive).join(', ')}. Exclude from EFB calculations.`
     });
   }
   if (closedRunwaysUpcoming.size > 0) {
@@ -908,7 +908,7 @@ function buildOperationalSummary(processedNotams = [], icao = '', now = new Date
       icon: 'clock',
       level: 'WARNING',
       timing: 'UPCOMING',
-      text: `[PRÓXIMAMENTE] Cierre programado en 3-4h: ${Array.from(closedRunwaysUpcoming).join(', ')}. Verificar hora estimada de llegada/salida.`
+      text: `[UPCOMING] Scheduled runway closure in 3-4h: ${Array.from(closedRunwaysUpcoming).join(', ')}. Verify estimated arrival/departure time.`
     });
   }
   if (navaidOutages.length > 0) {
@@ -916,7 +916,7 @@ function buildOperationalSummary(processedNotams = [], icao = '', now = new Date
       icon: 'radio',
       level: 'WARNING',
       timing: 'NOW',
-      text: `Radioayuda(s) U/S o en pruebas: ${navaidOutages.slice(0, 3).join(', ')}. Aumentar mínimos de aproximación o usar RNP.`
+      text: `Navaid(s) U/S or on test: ${navaidOutages.slice(0, 3).join(', ')}. Increase approach minima or plan RNP approach.`
     });
   }
   if (closedTaxiwaysActive.size > 0) {
@@ -924,7 +924,7 @@ function buildOperationalSummary(processedNotams = [], icao = '', now = new Date
       icon: 'alert-triangle',
       level: 'WARNING',
       timing: 'NOW',
-      text: `[ACTIVO AHORA] Calles de rodaje bloqueadas: ${Array.from(closedTaxiwaysActive).slice(0, 5).join(', ')}. Planificar rodaje con ATC.`
+      text: `[ACTIVE NOW] Closed taxiways: ${Array.from(closedTaxiwaysActive).slice(0, 5).join(', ')}. Coordinate taxi route with ATC.`
     });
   }
   if (closedTaxiwaysUpcoming.size > 0) {
@@ -932,7 +932,7 @@ function buildOperationalSummary(processedNotams = [], icao = '', now = new Date
       icon: 'clock',
       level: 'CAUTION',
       timing: 'UPCOMING',
-      text: `[PRÓXIMAMENTE] Cierres de rodaje en próximas horas: ${Array.from(closedTaxiwaysUpcoming).slice(0, 4).join(', ')}.`
+      text: `[UPCOMING] Taxiway closures in upcoming hours: ${Array.from(closedTaxiwaysUpcoming).slice(0, 4).join(', ')}.`
     });
   }
   if (lightingOutages.length > 0) {
@@ -940,7 +940,7 @@ function buildOperationalSummary(processedNotams = [], icao = '', now = new Date
       icon: 'lightbulb',
       level: 'CAUTION',
       timing: 'NOW',
-      text: `Ayudas visuales afectadas: ${lightingOutages.slice(0, 3).join(', ')}. Prever mayor visibilidad requerida en aproximación nocturna/IFR.`
+      text: `Visual aids affected: ${lightingOutages.slice(0, 3).join(', ')}. Expect higher visibility requirement on night/IFR approach.`
     });
   }
   if (airspaceRestrictions.length > 0) {
@@ -948,7 +948,7 @@ function buildOperationalSummary(processedNotams = [], icao = '', now = new Date
       icon: 'shield-alert',
       level: 'CRITICAL',
       timing: 'NOW',
-      text: `Espacio aéreo temporalmente restringido en las inmediaciones. Monitorear frecuencias radar.`
+      text: `Airspace temporarily restricted in vicinity. Monitor radar frequencies.`
     });
   }
   if (cranesObstacles.length > 0) {
@@ -956,7 +956,7 @@ function buildOperationalSummary(processedNotams = [], icao = '', now = new Date
       icon: 'alert-circle',
       level: 'CAUTION',
       timing: 'NOW',
-      text: `${cranesObstacles.length} grúa(s) u obstáculo(s) erigidos en el entorno. Mantener vigilancia visual.`
+      text: `${cranesObstacles.length} crane(s) / obstacle(s) erected in vicinity. Maintain visual vigilance.`
     });
   }
 
@@ -965,7 +965,7 @@ function buildOperationalSummary(processedNotams = [], icao = '', now = new Date
       icon: 'check',
       level: 'INFO',
       timing: 'NOW',
-      text: 'No se detectaron restricciones críticas inmediatas para el vuelo en este aeródromo en las próximas 3-4 horas.'
+      text: 'No immediate critical flight restrictions detected at this aerodrome for the next 3-4 hours.'
     });
   }
 

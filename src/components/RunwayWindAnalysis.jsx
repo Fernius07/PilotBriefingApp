@@ -10,7 +10,7 @@ export default function RunwayWindAnalysis({ windAnalysis, metar }) {
   if (!windAnalysis || !windAnalysis.runwayEnds || windAnalysis.runwayEnds.length === 0) {
     return (
       <div className="bg-cockpit-900 border border-cockpit-border rounded-xl p-6 text-center text-slate-400 font-mono">
-        No se encontraron datos de pistas para este aeródromo.
+        No runway data found for this aerodrome.
       </div>
     );
   }
@@ -44,12 +44,12 @@ export default function RunwayWindAnalysis({ windAnalysis, metar }) {
           <div className="flex items-center gap-2">
             <Compass className="w-5 h-5 text-cockpit-cyan" />
             <h2 className="font-mono font-bold text-base tracking-wider uppercase text-white">
-              ANÁLISIS DE PISTA Y COMPONENTES DEL VIENTO
+              RUNWAY & WIND COMPONENT ANALYSIS
             </h2>
           </div>
           <p className="text-xs text-slate-400 mt-1 font-mono">
-            Viento actual en superficie: <strong className="text-cockpit-cyan">{windDir !== 'VRB' ? `${String(windDir).padStart(3, '0')}°` : 'VRB'} a {windSpeed} KT</strong>
-            {windGust && <span className="text-amber-400"> (Rachas: {windGust} KT)</span>}
+            Current surface wind: <strong className="text-cockpit-cyan">{windDir !== 'VRB' ? `${String(windDir).padStart(3, '0')}°` : 'VRB'} at {windSpeed} KT</strong>
+            {windGust && <span className="text-amber-400"> (Gusts: {windGust} KT)</span>}
           </p>
         </div>
 
@@ -57,7 +57,7 @@ export default function RunwayWindAnalysis({ windAnalysis, metar }) {
         {bestRunway && (
           <div className="px-3 py-1.5 rounded-lg bg-emerald-500/15 border border-emerald-500/40 text-emerald-400 font-mono text-xs flex items-center gap-2 glow-green">
             <CheckCircle className="w-4 h-4 text-emerald-400" />
-            <span>PISTA PREFERIDA: <strong className="text-white text-sm">RWY {bestRunway}</strong></span>
+            <span>PREFERRED RUNWAY: <strong className="text-white text-sm">RWY {bestRunway}</strong></span>
           </div>
         )}
       </div>
@@ -198,11 +198,11 @@ export default function RunwayWindAnalysis({ windAnalysis, metar }) {
 
             {/* Wind Vector Label Badge overlay */}
             <div className="absolute bottom-2 left-2 right-2 text-center bg-cockpit-900/90 border border-cockpit-border rounded px-2 py-1 text-[11px] font-mono text-amber-300">
-              Flecha ámbar: Viento {windDir !== 'VRB' ? `${String(windDir).padStart(3, '0')}°` : 'VRB'} @ {windSpeed} KT
+              Amber arrow: Wind {windDir !== 'VRB' ? `${String(windDir).padStart(3, '0')}°` : 'VRB'} @ {windSpeed} KT
             </div>
           </div>
           <span className="text-[11px] font-mono text-slate-500 mt-2">
-            Haga clic en una pista para inspeccionar componentes
+            Click any runway to inspect wind components
           </span>
         </div>
 
@@ -216,18 +216,18 @@ export default function RunwayWindAnalysis({ windAnalysis, metar }) {
                     RWY {activeRunway.id}
                   </span>
                   <span className="text-xs font-mono text-slate-400">
-                    Rumbo: <strong className="text-slate-200">{String(activeRunway.heading).padStart(3, '0')}° MAG</strong>
+                    Heading: <strong className="text-slate-200">{String(activeRunway.heading).padStart(3, '0')}° MAG</strong>
                   </span>
                   {activeRunway.id === bestRunway && (
                     <span className="px-2 py-0.5 rounded bg-emerald-500/20 text-emerald-400 font-mono text-[10px] font-bold border border-emerald-500/40">
-                      FAVORECIDA
+                      FAVORED
                     </span>
                   )}
                 </div>
 
                 <div className="text-xs font-mono text-slate-400">
                   {activeRunway.dimension ? `${activeRunway.dimension} FT` : ''} 
-                  {activeRunway.surface ? ` (${activeRunway.surface === 'A' ? 'Asfalto' : activeRunway.surface === 'C' ? 'Hormigón' : 'Pavimento'})` : ''}
+                  {activeRunway.surface ? ` (${activeRunway.surface === 'A' ? 'Asphalt' : activeRunway.surface === 'C' ? 'Concrete' : 'Pavement'})` : ''}
                 </div>
               </div>
 
@@ -243,7 +243,7 @@ export default function RunwayWindAnalysis({ windAnalysis, metar }) {
                       : 'bg-cockpit-900 border-cockpit-border text-slate-400'
                 }`}>
                   <div className="flex items-center justify-between text-xs mb-1">
-                    <span>{activeRunway.windAnalysis.headwind > 0 ? 'VIENTO DE FRENTE' : 'VIENTO DE COLA'}</span>
+                    <span>{activeRunway.windAnalysis.headwind > 0 ? 'HEADWIND' : 'TAILWIND'}</span>
                     {activeRunway.windAnalysis.headwind > 0 ? <ArrowDown className="w-4 h-4" /> : <ArrowUp className="w-4 h-4" />}
                   </div>
                   <div className="text-2xl font-bold text-white">
@@ -254,7 +254,7 @@ export default function RunwayWindAnalysis({ windAnalysis, metar }) {
                         : '0 KT'}
                   </div>
                   <div className="text-[10px] opacity-80 mt-1">
-                    {activeRunway.windAnalysis.headwind > 0 ? 'Favorable para aterrizaje/despegue' : 'Desfavorable (Cola)'}
+                    {activeRunway.windAnalysis.headwind > 0 ? 'Favorable for landing/takeoff' : 'Unfavorable (Tailwind)'}
                   </div>
                 </div>
 
@@ -267,7 +267,7 @@ export default function RunwayWindAnalysis({ windAnalysis, metar }) {
                       : 'bg-cockpit-900 border-cockpit-border text-slate-300'
                 }`}>
                   <div className="flex items-center justify-between text-xs mb-1">
-                    <span>VIENTO CRUZADO</span>
+                    <span>CROSSWIND</span>
                     {activeRunway.windAnalysis.crosswindDir === 'LEFT' ? <ArrowRight className="w-4 h-4" /> : <ArrowLeft className="w-4 h-4" />}
                   </div>
                   <div className="text-2xl font-bold text-white">
@@ -275,21 +275,21 @@ export default function RunwayWindAnalysis({ windAnalysis, metar }) {
                   </div>
                   <div className="text-[10px] opacity-80 mt-1">
                     {activeRunway.windAnalysis.crosswindDir === 'LEFT' 
-                      ? 'Desde la IZQUIERDA' 
+                      ? 'From LEFT' 
                       : activeRunway.windAnalysis.crosswindDir === 'RIGHT' 
-                        ? 'Desde la DERECHA' 
-                        : 'Sin componente cruzado'}
+                        ? 'From RIGHT' 
+                        : 'No crosswind component'}
                   </div>
                 </div>
 
                 {/* Angular Difference */}
                 <div className="p-3 rounded-lg border border-cockpit-border bg-cockpit-900 font-mono col-span-2 sm:col-span-1">
-                  <div className="text-xs text-slate-400 mb-1">ÁNGULO RELATIVO</div>
+                  <div className="text-xs text-slate-400 mb-1">RELATIVE ANGLE</div>
                   <div className="text-2xl font-bold text-white">
                     {activeRunway.windAnalysis.angleDiff}°
                   </div>
                   <div className="text-[10px] text-slate-400 mt-1">
-                    Diferencia pista vs viento
+                    Runway vs wind offset
                   </div>
                 </div>
 
@@ -299,14 +299,14 @@ export default function RunwayWindAnalysis({ windAnalysis, metar }) {
               {activeRunway.windAnalysis.isHighTailwind && (
                 <div className="mt-3 p-2.5 rounded-lg bg-rose-500/15 border border-rose-500/40 text-rose-300 text-xs font-mono flex items-center gap-2">
                   <AlertTriangle className="w-4 h-4 flex-shrink-0 text-rose-400" />
-                  <span>PRECAUCIÓN: Componente de viento de cola superior a 10 KT. Verifique limitaciones de aeronave.</span>
+                  <span>CAUTION: Tailwind component exceeds 10 KT. Check aircraft operating limitations.</span>
                 </div>
               )}
 
               {activeRunway.windAnalysis.isHighCrosswind && (
                 <div className="mt-3 p-2.5 rounded-lg bg-amber-500/15 border border-amber-500/40 text-amber-300 text-xs font-mono flex items-center gap-2">
                   <AlertTriangle className="w-4 h-4 flex-shrink-0 text-amber-400" />
-                  <span>PRECAUCIÓN: Viento cruzado de {activeRunway.windAnalysis.crosswind} KT. Requiere técnica de aterrizaje con viento cruzado.</span>
+                  <span>CAUTION: Crosswind component of {activeRunway.windAnalysis.crosswind} KT. Crosswind landing technique required.</span>
                 </div>
               )}
             </div>
@@ -315,7 +315,7 @@ export default function RunwayWindAnalysis({ windAnalysis, metar }) {
           {/* Quick List of All Airport Runway Ends */}
           <div>
             <span className="text-xs font-mono text-slate-400 uppercase tracking-wider block mb-2">
-              TODAS LAS CABECERAS DE PISTA ({runwayEnds.length})
+              ALL RUNWAY ENDS ({runwayEnds.length})
             </span>
             <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
               {runwayEnds.map((rwy) => {

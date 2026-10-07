@@ -47,7 +47,7 @@ export function getFlightCategoryBadge(category) {
     default:
       return {
         label: 'UNK',
-        name: 'Desconocido',
+        name: 'Unknown',
         bgColor: 'bg-slate-700/30',
         textColor: 'text-slate-400',
         borderColor: 'border-slate-600',
@@ -69,7 +69,7 @@ export function formatZuluDateTime(date = new Date()) {
   const d = typeof date === 'string' || typeof date === 'number' ? new Date(date) : date;
   if (isNaN(d.getTime())) return '--/-- --:--Z';
   const day = String(d.getUTCDate()).padStart(2, '0');
-  const monthNames = ['ENE', 'FEB', 'MAR', 'ABR', 'MAY', 'JUN', 'JUL', 'AGO', 'SEP', 'OCT', 'NOV', 'DIC'];
+  const monthNames = ['JAN', 'FEB', 'MAR', 'APR', 'MAY', 'JUN', 'JUL', 'AUG', 'SEP', 'OCT', 'NOV', 'DEC'];
   const month = monthNames[d.getUTCMonth()];
   const hours = String(d.getUTCHours()).padStart(2, '0');
   const minutes = String(d.getUTCMinutes()).padStart(2, '0');
@@ -113,7 +113,7 @@ export function formatNotamDate(dateStr) {
   if (!dateStr) return '';
   const cleanStr = String(dateStr).trim();
   if (cleanStr === 'PERM' || cleanStr.includes('UFN') || cleanStr.toUpperCase() === 'PERMANENT') {
-    return 'PERMANENTE';
+    return 'PERMANENT';
   }
 
   let dateObj = null;

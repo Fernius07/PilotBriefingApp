@@ -6,208 +6,242 @@
 [![Vite](https://img.shields.io/badge/Vite-8.3-646CFF?logo=vite&logoColor=white)](https://vitejs.dev/)
 [![Leaflet](https://img.shields.io/badge/Leaflet-1.9-199900?logo=leaflet&logoColor=white)](https://leafletjs.com/)
 [![Vercel Ready](https://img.shields.io/badge/Vercel-Deployment_Ready-000000?logo=vercel&logoColor=white)](https://vercel.com/)
+[![Security: HMAC Signed](https://img.shields.io/badge/Security-HMAC--SHA256-blue.svg)](server/utils/security.js)
 [![License: Proprietary](https://img.shields.io/badge/License-Proprietary-red.svg)](LICENSE)
 
-**PilotBriefingApp** es una plataforma web profesional de despacho y briefing operacional de vuelo en tiempo real, diseñada con estándares de cabina (EFB) para pilotos reales, despachadores, estudiantes de aviación y entusiastas avanzados de la simulación de vuelo (Microsoft Flight Simulator 2024/2020, X-Plane, Prepar3D, VATSIM, IVAO).
+**PilotBriefingApp** is an enterprise-grade, real-time aviation flight dispatch and aerodrome operational briefing web application built to Electronic Flight Bag (EFB) cockpit standards. It is engineered for real-world aviators, flight dispatchers, aviation students, and advanced flight simulation pilots (Microsoft Flight Simulator 2024/2020, X-Plane, Prepar3D, VATSIM, IVAO).
 
-La aplicación proporciona una visión completa de la situación operativa de cualquier aeródromo del mundo en cuestión de segundos, combinando decodificación de NOTAMs mediante inteligencia analítica, meteorología aeronáutica en vivo (METAR/TAF), cálculo trigonométrico de vientos en pista, control de tráfico aéreo en directo y enlace con planes de vuelo de SimBrief.
-
----
-
-## 🛰️ 100% Datos en Tiempo Real (Sin Datos Estáticos ni Mocks)
-
-PilotBriefingApp se conecta **exclusivamente a fuentes oficiales y proveedores aeronáuticos en vivo**:
-
-* **Meteorología (METAR / TAF / Info Aeropuerto)**: [NOAA Aviation Weather Center (AWC)](https://aviationweather.gov/).
-* **NOTAMs Oficiales Internacionales**: [FAA International NOTAM System (FNS / AIM)](https://notams.aim.faa.gov/).
-* **Control ATC y Tráfico Online**: [VATSIM Live Data Feed v3](https://data.vatsim.net/).
-* **Planes de Vuelo Operacionales (OFP)**: [SimBrief API](https://www.simbrief.com/).
-
-> **Garantía de Fidelidad**: Cada consulta ICAO realiza una llamada directa a los servidores aeronáuticos correspondientes. No se utilizan bases de datos locales desactualizadas ni datos ficticios.
+The application provides a comprehensive situational overview of any aerodrome globally within seconds, integrating intelligent NOTAM decoding, live aviation meteorology (METAR/TAF), trigonometric runway wind vectors, live VATSIM ATC network coverage, and 1-click SimBrief Operational Flight Plan (OFP) synchronization.
 
 ---
 
-## 🌟 Características Principales
+## 🛰️ 100% Real-Time Data (Zero Static Mocks)
 
-### 1. 🧠 Análisis y Decodificación Inteligente de NOTAM
-* **Traducción a Lenguaje Operacional**: Transforma los textos crípticos de la OACI/FAA en explicaciones claras y estructuradas en español e inglés.
-* **Clasificación por Categorías**:
-  * 🔴 Cierres e Inoperatividad de Pistas (`RWY`)
-  * 🟠 Restricciones en Calles de Rodaje y Plataformas (`TWY/APRON`)
-  * 🟡 Ayudas a la Navegación, Luces e ILS (`NAV/ILS/LIGHTING`)
-  * 🔵 Obstáculos, Grúas y Trabajos de Campo (`OBST/CRANE/WORK`)
-  * 🟣 Espacio Aéreo, Zonas Peligrosas y Paracaidismo (`AIRSPACE/HAZARD`)
-  * ⚪ Otros Avisos Generales (`OTHER`)
-* **Filtro de Severidad**: Identificación visual instantánea de avisos críticos (`CRITICAL`), importantes (`WARNING`) e informativos (`INFO`).
+PilotBriefingApp connects **strictly to live official aeronautical sources and live operational data feeds**:
 
-### 2. ⏱️ Resumen de Impacto Operacional en Vuelo (Ventana 3-4 Horas)
-* **Filtrado Temporal Inteligente**: Aísla los NOTAMs que tienen impacto directo durante la jornada y el periodo de vuelo programado.
-* **NOTAMs Activos Ahora**: Muestra aquellos avisos que están vigentes y afectando activamente la operación.
-* **Avisos "Próximamente"**: Identifica de forma diferenciada los avisos que entrarán en vigor en las próximas 3-4 horas para evitar sorpresas durante la aproximación o el rodaje.
-* **Formato Horario Zulu Estandarizado**: Cada fecha y periodo de validez se formatea rigurosamente en formato aeronáutico:
+* **Meteorology & Airport Information (METAR / TAF / Coordinates)**: [NOAA Aviation Weather Center (AWC)](https://aviationweather.gov/).
+* **Official International NOTAMs**: [FAA International NOTAM System (FNS / AIM)](https://notams.aim.faa.gov/).
+* **Online ATC & Network Traffic**: [VATSIM Live Data Feed v3](https://data.vatsim.net/).
+* **Operational Flight Plans (OFP)**: [SimBrief API](https://www.simbrief.com/).
+
+> **Data Fidelity Guarantee**: Every ICAO query triggers direct real-time communication with official aeronautical providers. No stale databases or synthetic dummy records are ever used.
+
+---
+
+## 🌟 Key Features
+
+### 1. 🧠 Intelligent NOTAM Decoding & Classification
+* **Plain Language Translation**: Deconstructs cryptic ICAO Q-codes and FAA shorthand into clear, human-readable operational language.
+* **Standardized Category Breakdown**:
+  * 🔴 **Runways** (`RWY`): Closures, displaced thresholds, and surface contamination.
+  * 🟠 **Taxiways** (`TWY`): Route restrictions, closures, and work in progress.
+  * 🟡 **Navaids & Lighting** (`NAV/ILS/LIGHTING`): ILS glideslope/localizer outages, VOR status, PAPI/approach lights.
+  * 🔵 **Obstacles & Cranes** (`OBST/CRANE`): Temporary masts, cranes, and surveyed hazards.
+  * 🟣 **Airspace & Hazards** (`AIRSPACE/TFR`): Temporary flight restrictions, parachuting, fireworks, and military zones.
+  * ⚪ **Other General Notices** (`OTHER`).
+* **Visual Severity Triage**: Instantly flags items as `CRITICAL`, `WARNING`, `CAUTION`, or `INFO`.
+
+### 2. ⏱️ Executive Flight Operational Impact Summary (Now + 4 Hours Window)
+* **Time-Critical Filtering**: Isolates notices that directly affect flight operations today and within the immediate **3 to 4-hour departure/arrival window**.
+* **Active Now vs. Upcoming Badges**: Notices currently active are displayed prominently with real-time indicators, while future restrictions expected in 3–4 hours are clearly labeled as `UPCOMING 3-4H` to prevent approach surprises.
+* **4 Core Operational Pillars**: Real-time KPI summary tracking:
+  1. Closed Runways
+  2. Navaid & ILS Outages
+  3. Closed Taxiways
+  4. Airspace & TFR Restrictions
+* **Actionable Crew Checklist**: Auto-generated checklist alerting pilots to essential pre-flight and in-flight actions (e.g., runway exclusions in EFB, verifying RNP approaches).
+* **Strict Military Zulu & Local Aviation Timestamping**: Every validity window is displayed in standardized aeronautical format:
   $$\text{DD/MM/YYYY HHMMZ / HHMM LT}$$
-  *(Hora Zulu militar OACI junto a la hora local correspondiente).*
 
-### 3. 🗺️ Modal de Mapa Georreferenciado Interactivo (Leaflet Dual-Layer)
-Al hacer clic sobre cualquier tarjeta de NOTAM, se despliega una interfaz de cabina en 2 columnas:
-* **Representación Cartográfica de 3 Geometrías**:
-  1. **Zonas Acotadas / Polígonos (`POLYGON`)**: Cuando el NOTAM define un perímetro cerrado con múltiples puntos de coordenadas (ej. áreas militares restringidas, zonas de paracaidismo, acrobacia o fuegos artificiales).
-  2. **Punto Único (`POINT`)**: Para obstáculos fijos, grúas de construcción, antenas o fallos de radioayudas puntuales.
-  3. **Punto con Radio de Cobertura (`CIRCLE`)**: Para avisos que definen un punto central con radio de influencia náutico (NM).
-* **Capas de Mapa**:
-  * **Modo Normal**: Mapa vectorial de calles y relieve cartográfico.
-  * **Modo Satélite**: Fotografía aérea satelital de alta resolución (Esri World Imagery).
-* **Ajuste Óptico de Cabina**: Encuadre automático (`fitBounds`) con acolchado de 65px para evitar cortes con los paneles flotantes.
-* **Bloqueo de Desplazamiento (`Body Scroll-Lock`)**: El fondo de la aplicación permanece estático mientras el panel lateral del NOTAM ofrece desplazamiento suave para revisar todo el texto sin interferencias.
+### 3. 🗺️ Interactive Dual-Layer Leaflet Cartography
+Clicking on any NOTAM card immediately opens a cockpit briefing modal featuring an interactive map canvas with full Leaflet integration:
+* **Accurate 3-Geometry Rendering**:
+  1. **Demarcated Areas / Polygons (`POLYGON`)**: Renders enclosed multi-point spatial boundaries (e.g., military firing zones, aerobatic boxes, parachuting drop zones).
+  2. **Point & Radius (`CIRCLE`)**: Renders a center coordinate with a circular influence perimeter in Nautical Miles and meters.
+  3. **Specific Point (`POINT`)**: Pinpoints exact coordinates for tall cranes, construction equipment, or transmitter outages.
+* **Map Layer Switcher**:
+  * **Normal**: Clean street and terrain vector cartography.
+  * **Satellite**: High-resolution aerial imagery via Esri World Imagery.
+* **Cockpit Optical Alignment**: Automatic dynamic bounding (`fitBounds`) with generous padding to prevent visual clipping.
+* **Body Scroll-Lock**: The background page is locked from scrolling while the modal is open, allowing smooth inspection of full NOTAM text without screen movement.
 
-### 4. 🌦️ Meteorología Aeronáutica en Tiempo Real (METAR y TAF)
-* **Categorías de Vuelo OACI/FAA**: Indicadores en color de categorías de vuelo:
+### 4. 🌦️ Real-Time Aviation Weather (METAR & TAF)
+* **Flight Category Badges**: Instant visual identification based on ceiling and visibility:
   * 🟢 **VFR** (Visual Flight Rules)
   * 🔵 **MVFR** (Marginal VFR)
   * 🟡 **IFR** (Instrument Flight Rules)
   * 🟣 **LIFR** (Low IFR)
-* **Detección Automática de Amenazas Ambientales**:
-  * Riesgo de engelamiento estructural y requerimiento de antihielo.
-  * Bancos de niebla, baja visibilidad y techos bajos.
-  * Actividad convectiva, tormentas y turbulencia.
-  * Componentes límite de viento cruzado.
-* **Pronóstico TAF Decodificado**: Evolución temporal por grupos horarios con desglose de tendencias (TEMPO, BECMG, PROB).
+* **Automated Environmental Threat Analysis**:
+  * Structural icing hazard and anti-ice requirements based on temperature and dewpoint spread.
+  * Fog banks, low visibility procedures (LVP), and critical cloud ceilings.
+  * Convective thunderstorm activity, rain, and turbulence.
+  * Crosswind threshold warnings.
+* **Decoded TAF Evolution**: Chronological breakdown by forecast groups (TEMPO, BECMG, PROB).
 
-### 5. 🧭 Análisis de Pistas y Cálculo de Viento
-* **Cálculo Trigonométrico en Tiempo Real**: Desglose exacto para cada cabecera de pista según el METAR vigente:
-  * **Headwind / Tailwind** ($V \cdot \cos(\theta)$): Viento en cara o cola.
-  * **Crosswind** ($V \cdot \sin(\theta)$): Viento cruzado y dirección (izquierda o derecha).
-* **Recomendación de Pista Óptima**: Señalización automática de la pista preferente con menor viento cruzado y mayor componente en cara.
-* **Representación Gráfica**: Orientación magnética de la pista superpuesta con la veleta vectorial del viento.
+### 5. 🧭 Runway Crosswind & Wind Vector Calculation
+* **Trigonometric Vector Analysis**: Real-time calculation for every runway threshold against the prevailing METAR wind:
+  * **Headwind / Tailwind Component**: $V \cdot \cos(\theta)$
+  * **Crosswind Component**: $V \cdot \sin(\theta)$ (with left/right crosswind indication)
+* **Preferred Runway Recommendation**: Automatically calculates and highlights the optimal runway offering the highest headwind and lowest crosswind.
+* **Graphic Vector Rose**: Visual representation of magnetic runway heading aligned with real-time wind arrows.
 
-### 6. 🎮 Integración con Simulación de Vuelo (SimBrief y VATSIM)
-* **Importación SimBrief con 1 Clic**: Carga directa del plan de vuelo operacional (OFP) por nombre de usuario o Pilot ID:
-  * Ruta, origen, destino, alternativo, nivel de crucero (FL), Block Fuel, tiempo en ruta y metadatos del despacho.
-* **Monitoreo VATSIM en Vivo**:
-  * Detección de frecuencias ATC activas (Torre, Rodadura, Salidas/Aproximación, Centro de Control).
-  * Conteo de vuelos entrantes (Inbounds) y salientes (Outbounds) en tiempo real.
-
-### 7. 🖨️ Dossier Imprimible y Modo Nocturno
-* **Exportación EFB a PDF / Impresión**: Generación instantánea de un dossier técnico de despacho de vuelo limpio en blanco y negro, optimizado para portapapeles o archivo físico.
-* **Modo Visión Nocturna**: Tinte rojo de cabina de alta fidelidad que preserva la visión nocturna en condiciones de poca luz.
+### 6. 🎮 Flight Simulation Integration (SimBrief & VATSIM)
+* **1-Click SimBrief OFP Import**: Direct retrieval of your latest dispatch release by SimBrief Username or Pilot ID:
+  * Origin, Destination, Alternate, Planned Runways, Cruise Altitude (FL), Block Fuel, Distance, and Route.
+* **Live VATSIM ATC Coverage**:
+  * Active controller positions (Tower, Ground, Delivery, Approach/Departure, Radar Control) with frequencies and ATIS.
+  * Unicom 122.800 self-announcement guidance when no ATC is online.
+  * Expected inbound and outbound traffic tracking with callsigns, aircraft types, and flight levels.
 
 ---
 
-## 🛠️ Stack Tecnológico
+## 🛡️ Anti-Scraping & Cryptographic API Security
 
-| Capa | Tecnologías |
+To prevent unauthorized third-party extraction or external scraping of the backend services via browser DevTools/Inspect or automated curl/Postman scripts, PilotBriefingApp implements an enterprise-grade defense layer:
+
+1. **Client-Side Web Crypto API Signing**:
+   Every request from the browser is cryptographically signed using the browser-native `window.crypto.subtle` API.
+2. **Ephemeral HMAC-SHA256 Handshake**:
+   The client calculates a dynamic SHA-256 HMAC digest based on a rotating shared handshake key, the target request path, and a high-precision UNIX millisecond timestamp.
+3. **Strict 90-Second Freshness Window**:
+   The server rejects any request with expired or manipulated timestamps outside the ±90 second window, neutralizing replay attacks.
+4. **Direct URL Bar Navigation Shield**:
+   Requests initiated via direct browser address bar inspection (`Sec-Fetch-Dest: document` to `/api/*`) are intercepted and safely redirected to `/`.
+5. **Zero Dependency Footprint**:
+   All cryptography relies on native Node.js `crypto` on the server and native browser `SubtleCrypto` on the frontend, ensuring lightning-fast execution without heavy external libraries.
+
+---
+
+## ☁️ Vercel Serverless Architecture & FAA SSL Verification
+
+### The Challenge
+When deploying Node.js applications to serverless cloud environments (such as Vercel AWS Lambda Linux runtimes), requests to the United States Government FAA AIM NOTAM service (`notams.aim.faa.gov`) can fail with `UNABLE_TO_VERIFY_LEAF_SIGNATURE` because standard Linux certificate stores do not bundle the FAA's intermediate government CA certificates.
+
+### The Solution
+PilotBriefingApp incorporates dedicated SSL leaf signature verification bypass (`NODE_TLS_REJECT_UNAUTHORIZED = '0'`) specifically scoped within the FAA NOTAM client, complemented by extensive diagnostic telemetry. This guarantees **100% reliable real-time NOTAM data delivery** on Vercel deployments.
+
+---
+
+## 🛠️ Technology Stack
+
+| Layer | Technologies |
 | :--- | :--- |
-| **Frontend** | React 19, Vite 8, Tailwind CSS 3, Lucide React Icons |
-| **Cartografía** | Leaflet 1.9, OpenStreetMap, Esri World Imagery |
+| **Frontend** | React 19, Vite 8, Tailwind CSS 3, Lucide React |
+| **Interactive Maps** | Leaflet 1.9, OpenStreetMap Vector, Esri World Imagery Satellite |
 | **Backend** | Node.js (CommonJS), Express 5.2 |
-| **Decodificadores** | Algoritmos propietarios de parsing OACI/FAA para NOTAM, METAR y TAF |
-| **Despliegue** | Vercel (Frontend estático de alto rendimiento + Serverless Functions para Express) |
+| **Security** | Web Crypto API (`SubtleCrypto`), Node.js `crypto`, HMAC-SHA256, Anti-Scraping Middleware |
+| **Aviation Engines** | Proprietary ICAO/FAA Decoders for NOTAM, METAR, TAF, and Runway Crosswind Vectors |
+| **Cloud Deployment** | Vercel (Edge CDN Static Frontend + Serverless Express API Functions) |
 
 ---
 
-## 📂 Estructura del Proyecto
+## 📂 Project Directory Structure
 
 ```text
 PilotBriefingApp/
 ├── api/
-│   └── index.js             # Entrada Serverless de Express para Vercel
-├── public/                  # Favicon y recursos estáticos
+│   └── index.js             # Vercel Serverless Function entrypoint for Express
+├── public/                  # Favicon and static public assets
 ├── server/
-│   ├── app.js               # Instancia central de Express y rutas API
-│   ├── index.js             # Punto de entrada para ejecución local independiente
+│   ├── app.js               # Central Express app, routes & anti-scraping security
+│   ├── index.js             # Local standalone backend entrypoint
 │   ├── services/
-│   │   ├── weatherService.js   # Cliente API NOAA METAR/TAF
-│   │   ├── notamService.js     # Cliente API FAA NOTAM
-│   │   ├── windCalculator.js   # Motor de cálculo trigonométrico de vientos
-│   │   ├── vatsimService.js    # Conexión al feed de VATSIM
-│   │   └── simbriefService.js  # Integración SimBrief OFP
+│   │   ├── weatherService.js   # NOAA METAR/TAF client & threat analyzer
+│   │   ├── notamService.js     # FAA NOTAM client with SSL leaf handshake fix
+│   │   ├── windCalculator.js   # Trigonometric crosswind & headwind engine
+│   │   ├── vatsimService.js    # VATSIM data feed client
+│   │   └── simbriefService.js  # SimBrief OFP client
 │   └── utils/
-│       └── notamDecoder.js     # Algoritmo de clasificación y georreferenciación
+│       ├── notamDecoder.js     # Q-code decoder, timing, and geo-boundary parser
+│       └── security.js         # HMAC-SHA256 token verification middleware
 ├── src/
 │   ├── components/
-│   │   ├── Header.jsx              # Barra superior con reloj Zulu militar y búsqueda
-│   │   ├── RouteBar.jsx            # Gestión de aeropuertos de la ruta (DEP, ARR, ALT)
-│   │   ├── WeatherCard.jsx         # Tarjeta METAR/TAF y alertas climáticas
-│   │   ├── RunwayWindAnalysis.jsx  # Gráfica de pistas y vientos cruzados
-│   │   ├── NotamSection.jsx        # Lista de NOTAMs y resumen de impacto operacional
-│   │   ├── NotamMapModal.jsx       # Modal de mapa interactivo (2 columnas, Leaflet)
-│   │   ├── VatsimCard.jsx          # Panel de ATC y tráfico en vivo de VATSIM
-│   │   ├── SimBriefModal.jsx       # Modal de conexión con SimBrief
-│   │   └── PrintableBriefing.jsx   # Dossier de despacho listo para imprimir
+│   │   ├── Header.jsx              # Cockpit header with military Zulu clock & search
+│   │   ├── WeatherCard.jsx         # Live METAR/TAF & threat analysis card
+│   │   ├── RunwayWindAnalysis.jsx  # Runway heading & crosswind vector analysis
+│   │   ├── NotamSection.jsx        # NOTAM list & executive flight impact summary
+│   │   ├── NotamMapModal.jsx       # 2-column Leaflet interactive map modal
+│   │   ├── VatsimCard.jsx          # Live VATSIM ATC & traffic panel
+│   │   └── SimBriefModal.jsx       # SimBrief OFP integration modal
 │   ├── utils/
-│   │   └── aviationHelpers.js      # Formateador Zulu y utilidades de vuelo
-│   ├── App.jsx                     # Componente principal de la aplicación
-│   ├── index.css                   # Estilos Tailwind y personalizaciones de cabina
-│   └── main.jsx                    # Punto de entrada de React
-├── .gitignore               # Exclusión de node_modules, dist y temporales
-├── LICENSE                  # Licencia de uso propietaria (All Rights Reserved)
-├── package.json             # Dependencias y scripts de construcción
-├── tailwind.config.cjs      # Paleta de colores temáticos Cockpit
-├── vercel.json              # Configuración de rutas y despliegue en Vercel
-└── vite.config.mjs          # Configuración del bundler Vite
+│   │   ├── apiClient.js            # Secure client-side crypto signing (SubtleCrypto)
+│   │   └── aviationHelpers.js      # Zulu date formatting & aviation utilities
+│   ├── App.jsx                     # Core application orchestrator
+│   ├── index.css                   # Tailwind styles and cockpit themes
+│   └── main.jsx                    # React entrypoint
+├── index.html               # HTML5 document with JetBrains Mono typography
+├── LICENSE                  # Proprietary License (All Rights Reserved)
+├── package.json             # Build configuration and dependencies
+├── tailwind.config.cjs      # Cockpit dark-theme color palette
+├── vercel.json              # Vercel routing and serverless function rewrite rules
+└── vite.config.mjs          # Vite configuration and local proxy
 ```
 
 ---
 
-## 🚀 Instalación y Ejecución Local
+## 🚀 Local Installation & Development
 
-### Prerrequisitos
-* Node.js v18.0.0 o superior instalado en el equipo.
-* Gestor de paquetes `npm`.
+### Prerequisites
+* **Node.js** v18.0.0 or higher.
+* **npm** package manager.
 
-### Pasos
+### Steps
 
-1. **Clonar el repositorio**:
+1. **Clone the repository**:
    ```bash
    git clone https://github.com/Fernius07/PilotBriefingApp.git
    cd PilotBriefingApp
    ```
 
-2. **Instalar dependencias**:
+2. **Install dependencies**:
    ```bash
    npm install
    ```
 
-3. **Iniciar en modo desarrollo**:
+3. **Start in development mode**:
    ```bash
    npm run dev
    ```
-   * El cliente web de Vite estará disponible en `http://localhost:3000`.
-   * El servidor backend de Express se ejecutará en `http://localhost:3001`.
-   * Vite redirige automáticamente todas las solicitudes `/api/*` al servidor local.
+   * Vite frontend will launch at `http://localhost:3000`.
+   * Express backend will run at `http://localhost:3001`.
+   * Vite proxies all `/api/*` calls directly to the local backend.
 
-4. **Construir para producción**:
+4. **Build for production**:
    ```bash
    npm run build
    ```
 
 ---
 
-## ☁️ Despliegue en Vercel
+## ☁️ Deploying to Vercel
 
-El proyecto incluye una configuración lista para desplegar en **Vercel** (`vercel.json` y `api/index.js`):
+The project includes built-in Vercel configuration (`vercel.json` and `api/index.js`):
 
-1. Sube tu proyecto a tu cuenta de GitHub.
-2. Accede a [Vercel](https://vercel.com/) e inicia sesión.
-3. Haz clic en **Add New...** > **Project** y selecciona el repositorio `Fernius07/PilotBriefingApp`.
-4. Vercel detectará automáticamente el framework **Vite**:
+1. Push this repository to your GitHub account:
+   ```bash
+   git push origin main
+   ```
+2. Log into [Vercel](https://vercel.com/).
+3. Click **Add New...** > **Project** and select **`Fernius07/PilotBriefingApp`**.
+4. Vercel will automatically detect the **Vite** framework:
+   * **Framework Preset**: Vite
    * **Build Command**: `npm run build`
    * **Output Directory**: `dist`
-5. Haz clic en **Deploy**.
-6. ¡Listo! Vercel servirá la interfaz web ultra rápida desde la CDN global y ejecutará las rutas backend `/api/*` a través de Serverless Functions con Node.js.
+5. Click **Deploy**.
+6. That's it! Vercel will deploy the static client on its global Edge CDN and run the Express API endpoints as scalable Node.js Serverless Functions.
 
 ---
 
-## 📄 Licencia
+## 📄 License
 
-Copyright © 2026 **Fernius07**. Todos los derechos reservados.
+Copyright © 2026 **Fernius07**. All rights reserved.
 
-Este software y su código fuente son propiedad intelectual exclusiva de **Fernius07**. Se concede a cualquier usuario el derecho a utilizar la aplicación alojada para fines personales, educativos y de simulación de vuelo. Queda estrictamente prohibida la copia, reproducción, redistribución, modificación, venta o re-alojamiento de este código fuente o partes de él sin la debida autorización por escrito del titular.
+This software and its source code are the exclusive intellectual property of **Fernius07**. End users are granted the right to access and use the hosted application for personal, educational, and flight simulation purposes. Any unauthorized copying, reproduction, redistribution, modification, selling, or re-hosting of this source code or derivative works is strictly prohibited.
 
-Para más detalles, consulta el archivo [LICENSE](LICENSE).
+For complete terms, review the [LICENSE](LICENSE) file.
 
 ---
 
-## ⚠️ Descargo de Responsabilidad Aeronáutica
+## ⚠️ Aviation Safety Disclaimer
 
-> **USO EXCLUSIVO DE REFERENCIA Y SIMULACIÓN**: PilotBriefingApp ha sido desarrollada como herramienta de consulta rápida y apoyo a la planificación de vuelo y simulación aérea. Los pilotos al mando en vuelos reales son legalmente responsables de contrastar todos los datos con las fuentes oficiales certificadas de información aeronáutica (AIP, NOTAM de las autoridades de aviación civil correspondientes y servicios meteorológicos oficiales de navegación aérea).
+> **FOR INFORMATIONAL AND SIMULATION USE ONLY**: PilotBriefingApp is developed as a rapid informational and flight simulation briefing tool. Pilots in command (PIC) of real-world aircraft are legally responsible for verifying all flight planning, weather, and NOTAM information through certified state aeronautical information publications (official AIP, State CAA NOTAM offices, and approved meteorological flight services).

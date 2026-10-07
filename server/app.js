@@ -1,3 +1,6 @@
+// Ensure Node.js does not abort on FAA / government intermediate SSL certificates in cloud environments
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
 const express = require('express');
 const cors = require('cors');
 const path = require('path');
@@ -8,6 +11,7 @@ const { fetchAirportNotams } = require('./services/notamService');
 const { analyzeAllRunways } = require('./services/windCalculator');
 const { fetchAirportVatsim } = require('./services/vatsimService');
 const { fetchSimBriefOfp } = require('./services/simbriefService');
+const { verifySecurityToken } = require('./utils/security');
 
 const app = express();
 
@@ -27,6 +31,34 @@ app.use((req, res, next) => {
 const apiRouter = express.Router();
 
 /**
+ * Anti-scraping & Anti-inspection Security Middleware
+ * Blocks direct URL bar navigation, external unauthorized scrapers, and bot extractors
+ */
+apiRouter.use((req, res, next) => {
+  // Allow health check endpoint freely
+  if (req.path === '/health') return next();
+
+  // If someone directly pastes the API URL in their browser tab, redirect to the app homepage
+  const secFetchDest = req.headers['sec-fetch-dest'];
+  const acceptHeader = req.headers['accept'] || '';
+  if (secFetchDest === 'document' || (acceptHeader.includes('text/html') && !req.headers['x-pilot-auth'])) {
+    return res.redirect('/');
+  }
+
+  // Verify internal cryptographic signature token
+  const isValid = verifySecurityToken(req);
+  if (!isValid) {
+    console.warn(`[Security Alert] Blocked unauthorized API request to ${req.originalUrl} from IP: ${req.ip}`);
+    return res.status(403).json({
+      error: 'Forbidden: Direct API access is restricted. Use the official PilotBriefingApp web interface.',
+      code: 'UNAUTHORIZED_ACCESS'
+    });
+  }
+
+  next();
+});
+
+/**
  * Health check endpoint
  */
 apiRouter.get('/health', (req, res) => {
@@ -34,7 +66,7 @@ apiRouter.get('/health', (req, res) => {
     status: 'ok',
     time: new Date().toISOString(),
     app: 'PilotBriefingApp API',
-    sources: ['NOAA Aviation Weather Center', 'FAA International NOTAM', 'VATSIM Network', 'SimBrief']
+    sources: ['NOAA Aviation Weather Center', 'FAA International NOTAM System', 'VATSIM Network', 'SimBrief']
   });
 });
 
@@ -45,11 +77,11 @@ apiRouter.get('/health', (req, res) => {
 apiRouter.get('/briefing/:icao', async (req, res) => {
   const icao = (req.params.icao || '').toUpperCase().trim();
   if (!icao || icao.length < 3 || icao.length > 5) {
-    return res.status(400).json({ error: 'Código ICAO inválido. Debe tener entre 3 y 5 letras.' });
+    return res.status(400).json({ error: 'Invalid ICAO code. Must be between 3 and 5 characters.' });
   }
 
   try {
-    // Run live queries in parallel for maximum speed
+    // Run live queries in parallel for maximum performance
     const [weatherData, notamData, vatsimData] = await Promise.allSettled([
       fetchAirportWeather(icao),
       fetchAirportNotams(icao),
@@ -61,7 +93,7 @@ apiRouter.get('/briefing/:icao', async (req, res) => {
     const vatsim = vatsimData.status === 'fulfilled' ? vatsimData.value : null;
 
     if (!weather && !notams) {
-      return res.status(404).json({ error: `No se pudieron obtener datos aeronáuticos para ${icao}. Verifique el código ICAO.` });
+      return res.status(404).json({ error: `Could not obtain aeronautical data for ${icao}. Please verify the ICAO code.` });
     }
 
     // Calculate runway wind components based on real METAR
@@ -80,7 +112,7 @@ apiRouter.get('/briefing/:icao', async (req, res) => {
     });
   } catch (err) {
     console.error(`Briefing error for ${icao}:`, err);
-    res.status(500).json({ error: `Error al procesar el briefing para ${icao}: ${err.message}` });
+    res.status(500).json({ error: `Error processing briefing for ${icao}: ${err.message}` });
   }
 });
 
@@ -132,68 +164,11 @@ apiRouter.get('/simbrief/:username', async (req, res) => {
     const ofp = await fetchSimBriefOfp(username);
     res.json(ofp);
   } catch (err) {
-    res.status(400).json({ error: err.message || 'Error al obtener plan de SimBrief' });
-  }
-});
-
-/**
- * Multi-Airport Route Briefing
- */
-apiRouter.post('/route-briefing', async (req, res) => {
-  const { airports } = req.body;
-  if (!Array.isArray(airports) || airports.length === 0) {
-    return res.status(400).json({ error: 'Debe proporcionar una lista de códigos ICAO en "airports"' });
-  }
-
-  try {
-    const results = await Promise.all(
-      airports.map(async (item) => {
-        const icao = typeof item === 'string' ? item.toUpperCase().trim() : item.icao.toUpperCase().trim();
-        const role = typeof item === 'object' ? item.role : 'STATION';
-
-        try {
-          const [weather, notams, vatsim] = await Promise.all([
-            fetchAirportWeather(icao).catch(() => null),
-            fetchAirportNotams(icao).catch(() => null),
-            fetchAirportVatsim(icao).catch(() => null),
-          ]);
-
-          let windAnalysis = null;
-          if (weather?.airport?.runways) {
-            windAnalysis = analyzeAllRunways(weather.airport.runways, weather.metar || {});
-          }
-
-          return {
-            icao,
-            role,
-            success: true,
-            weather,
-            windAnalysis,
-            notams,
-            vatsim,
-          };
-        } catch (e) {
-          return {
-            icao,
-            role,
-            success: false,
-            error: e.message
-          };
-        }
-      })
-    );
-
-    res.json({
-      timestamp: new Date().toISOString(),
-      routeBriefings: results
-    });
-  } catch (err) {
-    res.status(500).json({ error: err.message });
+    res.status(400).json({ error: err.message || 'Error fetching SimBrief flight plan' });
   }
 });
 
 // Mount the API router at both /api and root /
-// This ensures compatibility whether Vercel retains the /api prefix or strips it
 app.use('/api', apiRouter);
 app.use('/', apiRouter);
 

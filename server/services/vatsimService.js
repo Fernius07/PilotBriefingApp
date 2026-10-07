@@ -37,14 +37,14 @@ async function getVatsimData() {
  */
 function getAtcPositionType(callsign) {
   const cs = (callsign || '').toUpperCase();
-  if (cs.endsWith('_DEL')) return { type: 'DELIVERY', order: 1, label: 'Autorizaciones (Delivery)' };
-  if (cs.endsWith('_GND')) return { type: 'GROUND', order: 2, label: 'Control Rodadura (Ground)' };
-  if (cs.endsWith('_TWR')) return { type: 'TOWER', order: 3, label: 'Torre de Control (Tower)' };
-  if (cs.endsWith('_DEP')) return { type: 'DEPARTURE', order: 4, label: 'Salidas (Departure)' };
-  if (cs.endsWith('_APP')) return { type: 'APPROACH', order: 5, label: 'Aproximación (Approach)' };
-  if (cs.endsWith('_CTR')) return { type: 'CENTER', order: 6, label: 'Control En Ruta (Radar/Center)' };
-  if (cs.endsWith('_ATIS')) return { type: 'ATIS', order: 0, label: 'Servicio ATIS' };
-  return { type: 'ATC', order: 7, label: 'Controlador de Tráfico' };
+  if (cs.endsWith('_DEL')) return { type: 'DELIVERY', order: 1, label: 'Clearance Delivery' };
+  if (cs.endsWith('_GND')) return { type: 'GROUND', order: 2, label: 'Ground Control' };
+  if (cs.endsWith('_TWR')) return { type: 'TOWER', order: 3, label: 'Control Tower' };
+  if (cs.endsWith('_DEP')) return { type: 'DEPARTURE', order: 4, label: 'Departure Control' };
+  if (cs.endsWith('_APP')) return { type: 'APPROACH', order: 5, label: 'Approach Control' };
+  if (cs.endsWith('_CTR')) return { type: 'CENTER', order: 6, label: 'En-Route Radar (Center)' };
+  if (cs.endsWith('_ATIS')) return { type: 'ATIS', order: 0, label: 'ATIS Broadcast' };
+  return { type: 'ATC', order: 7, label: 'Traffic Controller' };
 }
 
 /**

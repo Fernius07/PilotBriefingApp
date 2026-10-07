@@ -1,38 +1,40 @@
 PILOTBRIEFINGAPP SOFTWARE LICENSE AGREEMENT
 ===================================================
-Copyright (c) 2026 Fernius07. Todos los derechos reservados / All Rights Reserved.
+Copyright (c) 2026 Fernius07. All Rights Reserved.
 
-AVISO LEGAL / LEGAL NOTICE:
-Este software y su código fuente son propiedad intelectual exclusiva de Fernius07.
-This software and its source code are the exclusive intellectual property of Fernius07.
-
---------------------------------------------------------------------------------
-1. CONCESIÓN DE USO (PERMITTED USE)
---------------------------------------------------------------------------------
-Se concede a cualquier usuario final una licencia limitada, no exclusiva, intransferible y revocable para:
-- Acceder, visualizar e interactuar con la aplicación web PilotBriefingApp a través de sus despliegues oficiales y autorizados.
-- Utilizar las herramientas de briefing, decodificación de NOTAMs, visualización meteorológica y análisis de pistas para fines personales, educativos, de estudio aeronáutico y simulación de vuelo (Microsoft Flight Simulator, X-Plane, Prepar3D, VATSIM, IVAO).
+LEGAL NOTICE:
+This software and its entire source code, algorithms, interface designs, decoders, and backend architecture are the exclusive intellectual property of Fernius07.
 
 --------------------------------------------------------------------------------
-2. PROHIBICIONES Y RESTRICCIONES ESTRICTAS (RESTRICTIONS)
+1. PERMITTED USE (END-USER LICENSE)
 --------------------------------------------------------------------------------
-Queda TERMINANTEMENTE PROHIBIDO, sin el consentimiento previo, expreso y por escrito del autor (Fernius07):
-- COPIAR O DUPLICAR: Copiar, clonar, bifurcar con fines de apropiación, reproducir, duplicar o distribuir el código fuente, la lógica del servidor, los decodificadores o los diseños de interfaz, total o parcialmente.
-- REDISTRIBUCIÓN Y RE-HOSTING: Publicar, distribuir, sublicenciar, alquilar o alojar copias públicas o privadas independientes de este código fuente en otros repositorios, plataformas de hosting o dominios.
-- USO COMERCIAL: Vender, comercializar, monetizar o explotar económicamente este software, sus APIs o servicios derivados.
-- OBRAS DERIVADAS: Modificar, adaptar, transformar o crear trabajos derivados basados en este proyecto.
-- INGENIERÍA INVERSA: Descompilar, desensamblar o realizar ingeniería inversa sobre cualquier componente de la aplicación.
+A limited, non-exclusive, non-transferable, and revocable license is granted to any end-user to:
+- Access, view, and interact with the PilotBriefingApp web application through its officially authorized and hosted deployments.
+- Utilize the flight briefing, NOTAM decoding, meteorological analysis, runway wind calculations, and simulation network integration tools for personal, educational, aeronautical study, and flight simulation purposes (Microsoft Flight Simulator, X-Plane, Prepar3D, VATSIM, IVAO).
 
 --------------------------------------------------------------------------------
-3. PROPIEDAD INTELECTUAL (INTELLECTUAL PROPERTY)
+2. STRICT PROHIBITIONS & RESTRICTIONS
 --------------------------------------------------------------------------------
-Todos los derechos de autor, marcas, patentes, secretos comerciales y derechos de propiedad intelectual relativos a PilotBriefingApp pertenecen y seguirán perteneciendo única y exclusivamente a Fernius07. El acceso al repositorio o al servicio en línea no transfiere ningún derecho de propiedad sobre el software al usuario.
+It is STRICTLY PROHIBITED, without the prior, express, and written consent of the copyright holder (Fernius07):
+- NO COPYING OR DUPLICATION: Copying, cloning, duplicating, reproducing, distributing, or publishing the source code, backend server logic, security tokens, decoding engines, or interface designs, in whole or in part.
+- NO REDISTRIBUTION OR RE-HOSTING: Publishing, distributing, sublicensing, leasing, or hosting independent public or private copies or forks of this source code on any other repositories, hosting platforms, or domain names.
+- NO COMMERCIAL EXPLOITATION: Selling, licensing, renting, monetizing, or commercially exploiting this software, its APIs, or any derivative services.
+- NO DERIVATIVE WORKS: Modifying, adapting, altering, translating, or creating derivative works based on any part of this project.
+- NO REVERSE ENGINEERING: Decompiling, reverse engineering, disassembling, or extracting the proprietary algorithms or security mechanisms of the software.
+- NO SCRAPING OR UNAUTHORIZED API CONSUMPTION: Circumventing the application's cryptographic request-signing mechanism or using automated scripts, bots, or crawlers to harvest data from the backend endpoints.
 
 --------------------------------------------------------------------------------
-4. DESCARGO DE RESPONSABILIDAD AERONÁUTICA (AVIATION DISCLAIMER)
+3. INTELLECTUAL PROPERTY
 --------------------------------------------------------------------------------
-ESTE SOFTWARE SE SUMINISTRA "TAL CUAL" (AS IS), SIN GARANTÍAS DE NINGÚN TIPO, EXPRESAS O IMPLÍCITAS. 
-PilotBriefingApp está diseñada como herramienta de apoyo, consulta rápida y simulación de vuelo. 
-Para operaciones de vuelo en la aviación real (aviación comercial, ejecutiva o general), los pilotos al mando son legalmente responsables de verificar y basar sus decisiones de vuelo en la documentación oficial aprobada por las autoridades de aviación civil (AIP, cartas oficiales de aproximación, despachos OACI/FAA certificados y oficinas NOTAM oficiales).
+All copyrights, trademarks, patents, trade secrets, and intellectual property rights in and to PilotBriefingApp belong and shall remain solely and exclusively with Fernius07. Viewing or interacting with the public repository does not grant any transfer of ownership, intellectual property rights, or licensing rights beyond the explicit permitted use stated above.
 
-El autor no se hace responsable de errores, omisiones, interrupciones en los servicios de datos externos o cualquier perjuicio directo o indirecto derivado del uso de esta herramienta.
+--------------------------------------------------------------------------------
+4. AVIATION DISCLAIMER
+--------------------------------------------------------------------------------
+THIS SOFTWARE IS PROVIDED "AS IS", WITHOUT WARRANTY OF ANY KIND, EXPRESS OR IMPLIED, INCLUDING BUT NOT LIMITED TO THE WARRANTIES OF MERCHANTABILITY, FITNESS FOR A PARTICULAR PURPOSE, AND NONINFRINGEMENT.
+
+PilotBriefingApp is designed as a supplementary tool for flight simulation, academic training, and preliminary informational briefing. 
+
+FOR REAL-WORLD FLIGHT OPERATIONS: Pilots in command (PIC) are solely and legally responsible for verifying all operational, weather, and NOTAM information against certified, official aeronautical publications (official AIP, State CAA NOTAM offices, official aviation weather services, and authorized operational dispatch releases).
+
+The author assumes no liability for any errors, omissions, interruptions in third-party data feeds, or any direct, indirect, incidental, or consequential damages resulting from the use of this software.
