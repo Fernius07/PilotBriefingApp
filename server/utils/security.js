@@ -19,8 +19,9 @@ function generateSignature(timestamp, path) {
  * Prevents automated scrapers, third-party hotlinking, and unauthorized API reuse
  */
 function verifySecurityToken(req) {
-  // Always permit public health check
+  // Always permit public health check and debug-notam diagnostic route
   if (req.path === '/health' || req.path === '/api/health') return true;
+  if (req.path.includes('debug-notam') || (req.originalUrl && req.originalUrl.includes('debug-notam'))) return true;
 
   // Direct browser document navigation protection
   // If someone pastes the API URL into their browser address bar, deny or redirect

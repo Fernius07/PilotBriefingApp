@@ -35,8 +35,10 @@ const apiRouter = express.Router();
  * Blocks direct URL bar navigation, external unauthorized scrapers, and bot extractors
  */
 apiRouter.use((req, res, next) => {
-  // Allow health check endpoint freely
-  if (req.path === '/health') return next();
+  // Allow health check and debug endpoints freely
+  if (req.path === '/health' || req.path.includes('debug-notam') || (req.originalUrl && req.originalUrl.includes('debug-notam'))) {
+    return next();
+  }
 
   // If someone directly pastes the API URL in their browser tab, redirect to the app homepage
   const secFetchDest = req.headers['sec-fetch-dest'];
@@ -68,6 +70,62 @@ apiRouter.get('/health', (req, res) => {
     app: 'PilotBriefingApp API',
     sources: ['NOAA Aviation Weather Center', 'FAA International NOTAM System', 'VATSIM Network', 'SimBrief']
   });
+});
+
+/**
+ * Live FAA Upstream Diagnostic Route (Exempt from security token)
+ * Allows developers and pilots to inspect raw FAA upstream responses in real-time
+ */
+apiRouter.get('/debug-notam/:icao', async (req, res) => {
+  const icao = (req.params.icao || '').toUpperCase().trim();
+  const start = Date.now();
+  const url = 'https://notams.aim.faa.gov/notamSearch/search';
+  const body = `searchType=0&designatorsForLocation=${encodeURIComponent(icao)}`;
+  try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 7000);
+
+    const upstreamRes = await fetch(url, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/x-www-form-urlencoded; charset=UTF-8',
+        'User-Agent': 'Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 (KHTML, like Gecko) Chrome/124.0.0.0 Safari/537.36',
+        'Referer': 'https://notams.aim.faa.gov/notamSearch/',
+        'Origin': 'https://notams.aim.faa.gov',
+        'Accept': 'application/json, text/javascript, */*; q=0.01',
+        'Cookie': 'DR_SITE_PM=https://notams.aim.faa.gov/notamSearch/;'
+      },
+      body,
+      signal: controller.signal
+    });
+    clearTimeout(timeout);
+
+    const text = await upstreamRes.text();
+    let parsed = null;
+    try {
+      parsed = JSON.parse(text);
+    } catch (_) {}
+
+    res.json({
+      icao,
+      durationMs: Date.now() - start,
+      status: upstreamRes.status,
+      statusText: upstreamRes.statusText,
+      ok: upstreamRes.ok,
+      headers: Object.fromEntries(upstreamRes.headers.entries()),
+      isJson: !!parsed,
+      totalNotamCount: parsed?.totalNotamCount,
+      notamListLength: parsed?.notamList?.length || 0,
+      preview: parsed ? parsed.notamList?.slice(0, 3) : text.slice(0, 500)
+    });
+  } catch (err) {
+    res.status(500).json({
+      icao,
+      durationMs: Date.now() - start,
+      error: err.message,
+      stack: err.stack
+    });
+  }
 });
 
 /**
