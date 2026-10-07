@@ -50,8 +50,8 @@ PilotBriefingApp connects **strictly to live official aeronautical sources and l
   3. Closed Taxiways
   4. Airspace & TFR Restrictions
 * **Actionable Crew Checklist**: Auto-generated checklist alerting pilots to essential pre-flight and in-flight actions (e.g., runway exclusions in EFB, verifying RNP approaches).
-* **Strict Military Zulu & Local Aviation Timestamping**: Every validity window is displayed in standardized aeronautical format:
-  $$\text{DD/MM/YYYY HHMMZ / HHMM LT}$$
+* **Strict Military Zulu Aviation Timestamping**: Every validity window is displayed in standardized aeronautical format:
+  $$\text{DD/MM/YYYY HHMMZ}$$
 
 ### 3. 🗺️ Interactive Dual-Layer Leaflet Cartography
 Clicking on any NOTAM card immediately opens a cockpit briefing modal featuring an interactive map canvas with full Leaflet integration:

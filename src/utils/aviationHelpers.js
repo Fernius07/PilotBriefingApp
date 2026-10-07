@@ -150,17 +150,13 @@ export function formatNotamDate(dateStr) {
     return cleanStr;
   }
 
-  // DD/MM/YYYY HHMM UTC
+  // DD/MM/YYYY HHMMZ (Zulu time only)
   const dd = String(dateObj.getUTCDate()).padStart(2, '0');
   const mm = String(dateObj.getUTCMonth() + 1).padStart(2, '0');
   const yyyy = dateObj.getUTCFullYear();
   const utcHH = String(dateObj.getUTCHours()).padStart(2, '0');
   const utcMM = String(dateObj.getUTCMinutes()).padStart(2, '0');
 
-  // HHMM LT (Local Time of browser/user)
-  const ltHH = String(dateObj.getHours()).padStart(2, '0');
-  const ltMM = String(dateObj.getMinutes()).padStart(2, '0');
-
-  return `${dd}/${mm}/${yyyy} ${utcHH}${utcMM}Z / ${ltHH}${ltMM} LT`;
+  return `${dd}/${mm}/${yyyy} ${utcHH}${utcMM}Z`;
 }
 

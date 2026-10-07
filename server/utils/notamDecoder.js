@@ -297,10 +297,7 @@ function formatNotamDate(dateStr) {
   const utcHH = String(dateObj.getUTCHours()).padStart(2, '0');
   const utcMM = String(dateObj.getUTCMinutes()).padStart(2, '0');
 
-  const ltHH = String(dateObj.getHours()).padStart(2, '0');
-  const ltMM = String(dateObj.getMinutes()).padStart(2, '0');
-
-  return `${dd}/${mm}/${yyyy} ${utcHH}${utcMM}Z / ${ltHH}${ltMM} LT`;
+  return `${dd}/${mm}/${yyyy} ${utcHH}${utcMM}Z`;
 }
 
 
