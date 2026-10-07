@@ -226,15 +226,17 @@ apiRouter.get('/simbrief/:username', async (req, res) => {
   }
 });
 
-// Mount the API router at both /api and root /
-app.use('/api', apiRouter);
-app.use('/', apiRouter);
-
-// Serve static frontend build from dist if available (for standalone production Node.js)
+// Serve static frontend build from dist if available (for standalone production Node.js like Render/Railway)
 const distPath = path.join(__dirname, '../dist');
 if (fs.existsSync(distPath)) {
   app.use(express.static(distPath));
-  // SPA fallback for non-API routes in Express 5
+}
+
+// Mount the API router at /api
+app.use('/api', apiRouter);
+
+// SPA fallback for non-API routes in Express 5 (serving React client)
+if (fs.existsSync(distPath)) {
   app.use((req, res, next) => {
     if (req.path.startsWith('/api')) return next();
     res.sendFile(path.join(distPath, 'index.html'));
