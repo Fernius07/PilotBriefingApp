@@ -1,0 +1,38 @@
+PILOTBRIEFINGAPP SOFTWARE LICENSE AGREEMENT
+===================================================
+Copyright (c) 2026 Fernius07. Todos los derechos reservados / All Rights Reserved.
+
+AVISO LEGAL / LEGAL NOTICE:
+Este software y su código fuente son propiedad intelectual exclusiva de Fernius07.
+This software and its source code are the exclusive intellectual property of Fernius07.
+
+--------------------------------------------------------------------------------
+1. CONCESIÓN DE USO (PERMITTED USE)
+--------------------------------------------------------------------------------
+Se concede a cualquier usuario final una licencia limitada, no exclusiva, intransferible y revocable para:
+- Acceder, visualizar e interactuar con la aplicación web PilotBriefingApp a través de sus despliegues oficiales y autorizados.
+- Utilizar las herramientas de briefing, decodificación de NOTAMs, visualización meteorológica y análisis de pistas para fines personales, educativos, de estudio aeronáutico y simulación de vuelo (Microsoft Flight Simulator, X-Plane, Prepar3D, VATSIM, IVAO).
+
+--------------------------------------------------------------------------------
+2. PROHIBICIONES Y RESTRICCIONES ESTRICTAS (RESTRICTIONS)
+--------------------------------------------------------------------------------
+Queda TERMINANTEMENTE PROHIBIDO, sin el consentimiento previo, expreso y por escrito del autor (Fernius07):
+- COPIAR O DUPLICAR: Copiar, clonar, bifurcar con fines de apropiación, reproducir, duplicar o distribuir el código fuente, la lógica del servidor, los decodificadores o los diseños de interfaz, total o parcialmente.
+- REDISTRIBUCIÓN Y RE-HOSTING: Publicar, distribuir, sublicenciar, alquilar o alojar copias públicas o privadas independientes de este código fuente en otros repositorios, plataformas de hosting o dominios.
+- USO COMERCIAL: Vender, comercializar, monetizar o explotar económicamente este software, sus APIs o servicios derivados.
+- OBRAS DERIVADAS: Modificar, adaptar, transformar o crear trabajos derivados basados en este proyecto.
+- INGENIERÍA INVERSA: Descompilar, desensamblar o realizar ingeniería inversa sobre cualquier componente de la aplicación.
+
+--------------------------------------------------------------------------------
+3. PROPIEDAD INTELECTUAL (INTELLECTUAL PROPERTY)
+--------------------------------------------------------------------------------
+Todos los derechos de autor, marcas, patentes, secretos comerciales y derechos de propiedad intelectual relativos a PilotBriefingApp pertenecen y seguirán perteneciendo única y exclusivamente a Fernius07. El acceso al repositorio o al servicio en línea no transfiere ningún derecho de propiedad sobre el software al usuario.
+
+--------------------------------------------------------------------------------
+4. DESCARGO DE RESPONSABILIDAD AERONÁUTICA (AVIATION DISCLAIMER)
+--------------------------------------------------------------------------------
+ESTE SOFTWARE SE SUMINISTRA "TAL CUAL" (AS IS), SIN GARANTÍAS DE NINGÚN TIPO, EXPRESAS O IMPLÍCITAS. 
+PilotBriefingApp está diseñada como herramienta de apoyo, consulta rápida y simulación de vuelo. 
+Para operaciones de vuelo en la aviación real (aviación comercial, ejecutiva o general), los pilotos al mando son legalmente responsables de verificar y basar sus decisiones de vuelo en la documentación oficial aprobada por las autoridades de aviación civil (AIP, cartas oficiales de aproximación, despachos OACI/FAA certificados y oficinas NOTAM oficiales).
+
+El autor no se hace responsable de errores, omisiones, interrupciones en los servicios de datos externos o cualquier perjuicio directo o indirecto derivado del uso de esta herramienta.
