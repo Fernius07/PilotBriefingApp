@@ -4,6 +4,7 @@
   "description": "PilotBriefingApp - Live Aviation Briefing & Intelligent NOTAM Analyzer",
   "main": "server/index.js",
   "scripts": {
+    "start": "node server/index.js",
     "dev:server": "node --use-system-ca server/index.js",
     "dev:client": "vite",
     "dev": "concurrently \"npm run dev:server\" \"npm run dev:client\"",
