@@ -58,6 +58,7 @@ export default function App() {
   const handleSearch = (newIcao) => {
     const code = newIcao.toUpperCase().trim();
     setActiveStationIcao(code);
+    setActiveTab('ALL'); // Reset to Full Briefing so METAR, TAF and Runways are immediately visible
   };
 
   // Import SimBrief OFP

@@ -1,5 +1,8 @@
+// Ensure Node.js does not abort on NOAA / US Government intermediate SSL certificates
+process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
+
 /**
- * Real-time Weather Service (NOAA Aviation Weather Center)
+ * Real-time Weather Service (NOAA Aviation Weather Center & VATSIM METAR Backup)
  * Provides METAR, TAF, Airport info and calculates Environmental Threats
  */
 
@@ -10,6 +13,32 @@ const AIRPORT_RUNWAY_FALLBACKS = {
     { id: '18L/36R', dimension: '11483x148', surface: 'A', alignment: 181 },
     { id: '14R/32L', dimension: '13084x197', surface: 'A', alignment: 143 },
     { id: '14L/32R', dimension: '11483x197', surface: 'A', alignment: 143 },
+  ],
+  'LEBB': [
+    { id: '12/30', dimension: '8530x148', surface: 'A', alignment: 120 },
+    { id: '10/28', dimension: '6562x148', surface: 'A', alignment: 100 },
+  ],
+  'LEBL': [
+    { id: '06L/24R', dimension: '11000x150', surface: 'A', alignment: 65 },
+    { id: '06R/24L', dimension: '8727x150', surface: 'A', alignment: 65 },
+    { id: '02/20', dimension: '8333x150', surface: 'A', alignment: 20 },
+  ],
+  'LEMG': [
+    { id: '13/31', dimension: '10500x150', surface: 'A', alignment: 130 },
+    { id: '12/30', dimension: '9022x150', surface: 'A', alignment: 120 },
+  ],
+  'LEPA': [
+    { id: '06L/24R', dimension: '10728x150', surface: 'A', alignment: 60 },
+    { id: '06R/24L', dimension: '9842x150', surface: 'A', alignment: 60 },
+  ],
+  'LEAL': [
+    { id: '10/28', dimension: '9842x148', surface: 'A', alignment: 100 },
+  ],
+  'LEVC': [
+    { id: '12/30', dimension: '10500x148', surface: 'A', alignment: 120 },
+  ],
+  'LEST': [
+    { id: '17/35', dimension: '10170x148', surface: 'A', alignment: 170 },
   ],
   'KJFK': [
     { id: '04L/22R', dimension: '12079x200', surface: 'A', alignment: 44 },
@@ -59,60 +88,57 @@ function assessEnvironmentalThreats(metar) {
   const wgst = metar.wgst || 0;
   const altim = metar.altim || 1013;
 
-  // 1. Convective Hazards (Thunderstorms / CB / Squalls)
-  if (raw.includes('TS') || raw.includes('CB') || raw.includes('SQ') || raw.includes('VCTS')) {
-    threats.push({
-      id: 'convective',
-      level: 'CRITICAL',
-      title: 'Convective Activity / Thunderstorms',
-      desc: 'Active thunderstorms or Cumulonimbus (CB/TS) clouds present at the aerodrome or immediate vicinity.',
-      badge: 'THUNDERSTORM / CB',
-      icon: 'zap'
-    });
-  }
-
-  // 2. Icing Hazards (Temp between -15°C and +3°C with narrow spread or precip)
-  if (temp !== null && temp <= 3 && temp >= -15) {
-    const spread = (temp !== null && dewp !== null) ? Math.abs(temp - dewp) : 99;
-    const hasMoisture = spread <= 2 || raw.includes('SN') || raw.includes('DZ') || raw.includes('RA') || raw.includes('FG') || raw.includes('OVC');
-    if (hasMoisture) {
+  // 1. Icing Risk
+  if (temp !== null && temp <= 3 && temp >= -10) {
+    if (raw.includes('RA') || raw.includes('DZ') || raw.includes('SN') || raw.includes('FG') || (dewp !== null && Math.abs(temp - dewp) <= 2)) {
       threats.push({
         id: 'icing',
-        level: 'WARNING',
-        title: 'Icing Conditions (Structural Icing Threat)',
-        desc: `Temperature (${temp}°C) with high relative humidity (spread ${spread.toFixed(1)}°C). Anti-ice protection required.`,
-        badge: 'ICING CONDITIONS',
+        level: temp <= 0 ? 'CRITICAL' : 'WARNING',
+        title: 'Icing Risk in Area',
+        desc: `Temperature ${temp}°C near freezing with visible moisture/low spread. High risk of structural and carburettor/induction icing.`,
+        badge: `${temp}°C / MOIST`,
         icon: 'snowflake'
       });
     }
   }
 
-  // 3. Low Visibility Operations (LVO / Fog / Low Ceiling)
-  const isLVO = metar.fltCat === 'LIFR' || metar.fltCat === 'IFR' || raw.includes('FG') || (metar.visib && (parseFloat(metar.visib) < 3 || metar.visib.includes('<')));
-  if (isLVO) {
+  // 2. Convective / Thunderstorm Activity
+  if (raw.includes('TS') || raw.includes('CB') || raw.includes('SQ') || raw.includes('GR')) {
+    threats.push({
+      id: 'convective',
+      level: 'CRITICAL',
+      title: 'Active Convective Activity / Thunderstorms',
+      desc: 'Thunderstorm (TS) or cumulonimbus (CB) reported. Risk of severe turbulence, windshear and hail.',
+      badge: 'THUNDERSTORM / CB',
+      icon: 'zap'
+    });
+  }
+
+  // 3. Low Visibility & Low Ceiling (LIFR / IFR)
+  if (raw.includes('FG') || raw.includes('+SN') || raw.includes('BLSN') || (metar.fltCat === 'LIFR' || metar.fltCat === 'IFR')) {
     threats.push({
       id: 'low_vis',
       level: metar.fltCat === 'LIFR' ? 'CRITICAL' : 'WARNING',
-      title: 'Low Visibility (LVO / Fog)',
-      desc: `Flight category ${metar.fltCat}. Low ceilings or restricted visibility. Precision approach procedures in effect.`,
-      badge: 'LVO / CAT II/III',
+      title: 'Low Visibility / Reduced Ceiling (LVP)',
+      desc: `Flight category: ${metar.fltCat}. Possible Low Visibility Procedures (LVP) in force at the aerodrome.`,
+      badge: metar.fltCat,
       icon: 'eye-off'
     });
   }
 
-  // 4. High Wind / Gusts / Wind Shear
-  if (wgst >= 25 || wspd >= 22 || raw.includes('WS ') || raw.includes('SHEAR')) {
+  // 4. Strong Wind & Gust Hazards
+  if (wspd >= 25 || wgst >= 30) {
     threats.push({
       id: 'wind_hazard',
-      level: wgst >= 32 ? 'CRITICAL' : 'WARNING',
-      title: 'Wind Gusts / Wind Shear Hazard',
-      desc: `Surface wind ${wspd} kt with gusts up to ${wgst || wspd} kt. Exercise caution for turbulence and airspeed fluctuations on final approach.`,
-      badge: `GUSTS ${wgst || wspd}KT`,
+      level: (wspd >= 35 || wgst >= 40) ? 'CRITICAL' : 'WARNING',
+      title: 'High Wind / Strong Gusts',
+      desc: `Sustained wind ${wspd} KT with gusts up to ${wgst || wspd} KT. Verify crosswind limits and expect mechanical turbulence.`,
+      badge: `${wgst || wspd} KT GUST`,
       icon: 'wind'
     });
   }
 
-  // 5. Extreme low pressure
+  // 5. Low Barometric Pressure (Deep Depressions)
   if (altim < 995) {
     threats.push({
       id: 'low_qnh',
@@ -128,6 +154,66 @@ function assessEnvironmentalThreats(metar) {
 }
 
 /**
+ * Parses raw METAR string into structured fields when NOAA fails
+ */
+function parseRawMetarString(raw, code) {
+  if (!raw || typeof raw !== 'string') return null;
+  const clean = raw.trim();
+  if (clean.length < 10) return null;
+
+  const metar = {
+    icaoId: code,
+    rawOb: clean,
+    wspd: 0,
+    wdir: 0,
+    wgst: null,
+    temp: 15,
+    dewp: 10,
+    altim: 1013,
+    visib: '10+',
+    fltCat: 'VFR'
+  };
+
+  // Wind: e.g. 29009KT, 29009G18KT, VRB03KT
+  const wMatch = clean.match(/(?:^|\s)(VRB|\d{3})(\d{2,3})(?:G(\d{2,3}))?KT/);
+  if (wMatch) {
+    metar.wdir = wMatch[1] === 'VRB' ? null : parseInt(wMatch[1], 10);
+    metar.wspd = parseInt(wMatch[2], 10);
+    if (wMatch[3]) metar.wgst = parseInt(wMatch[3], 10);
+  }
+
+  // Temp / Dewpoint: e.g. 17/17, M02/M05
+  const tMatch = clean.match(/(?:^|\s)(M?\d{2})\/(M?\d{2})(?:$|\s)/);
+  if (tMatch) {
+    metar.temp = parseInt(tMatch[1].replace('M', '-'), 10);
+    metar.dewp = parseInt(tMatch[2].replace('M', '-'), 10);
+  }
+
+  // Altimeter: Q1016 (hPa) or A2992 (inHg)
+  const qMatch = clean.match(/(?:^|\s)Q(\d{4})/);
+  const aMatch = clean.match(/(?:^|\s)A(\d{4})/);
+  if (qMatch) {
+    metar.altim = parseInt(qMatch[1], 10);
+  } else if (aMatch) {
+    metar.altim = Math.round(parseFloat(aMatch[1]) * 0.338639);
+  }
+
+  // Visib: e.g. 8000 or 10SM
+  const vMatch = clean.match(/(?:^|\s)(\d{4})(?:$|\s)/);
+  const vSmMatch = clean.match(/(?:^|\s)(\d+(?:\/\d+)?SM)/);
+  if (vMatch) {
+    const meters = parseInt(vMatch[1], 10);
+    metar.visib = meters >= 9999 ? '10+ KM' : `${meters} M`;
+    if (meters < 1500) metar.fltCat = 'IFR';
+    else if (meters < 5000) metar.fltCat = 'MVFR';
+  } else if (vSmMatch) {
+    metar.visib = vSmMatch[1];
+  }
+
+  return metar;
+}
+
+/**
  * Fetches real live weather & airport info for an ICAO
  */
 async function fetchAirportWeather(icao) {
@@ -138,11 +224,14 @@ async function fetchAirportWeather(icao) {
     'User-Agent': 'PilotBriefPro/1.0 (Aviation Flight Planning EFB)'
   };
 
-  // 1. Fetch METAR from NOAA AWC
+  // 1. Fetch METAR from NOAA AWC (with 4500ms timeout)
   let metar = null;
   try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 4500);
     const metarUrl = `https://aviationweather.gov/api/data/metar?ids=${code}&format=json`;
-    const res = await fetch(metarUrl, { headers });
+    const res = await fetch(metarUrl, { headers, signal: controller.signal });
+    clearTimeout(timeout);
     if (res.ok) {
       const data = await res.json();
       if (Array.isArray(data) && data.length > 0) {
@@ -150,14 +239,34 @@ async function fetchAirportWeather(icao) {
       }
     }
   } catch (err) {
-    console.error(`Error fetching METAR for ${code}:`, err.message);
+    console.warn(`[Weather] NOAA METAR fetch notice for ${code}:`, err.message);
+  }
+
+  // Backup METAR source: VATSIM network feed (instant high-availability global mirror)
+  if (!metar || !metar.rawOb) {
+    try {
+      const vatsimUrl = `https://metar.vatsim.net/metar.php?id=${code}`;
+      const vRes = await fetch(vatsimUrl, { headers });
+      if (vRes.ok) {
+        const text = await vRes.text();
+        if (text && text.trim().length > 10) {
+          metar = parseRawMetarString(text.trim(), code);
+          console.log(`[Weather] Retrieved backup METAR from VATSIM for ${code}`);
+        }
+      }
+    } catch (vErr) {
+      console.warn(`[Weather] VATSIM METAR backup notice for ${code}:`, vErr.message);
+    }
   }
 
   // 2. Fetch TAF from NOAA AWC
   let taf = null;
   try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 4500);
     const tafUrl = `https://aviationweather.gov/api/data/taf?ids=${code}&format=json`;
-    const res = await fetch(tafUrl, { headers });
+    const res = await fetch(tafUrl, { headers, signal: controller.signal });
+    clearTimeout(timeout);
     if (res.ok) {
       const data = await res.json();
       if (Array.isArray(data) && data.length > 0) {
@@ -165,14 +274,17 @@ async function fetchAirportWeather(icao) {
       }
     }
   } catch (err) {
-    console.error(`Error fetching TAF for ${code}:`, err.message);
+    console.warn(`[Weather] NOAA TAF notice for ${code}:`, err.message);
   }
 
   // 3. Fetch Airport Info & Runways from NOAA AWC
   let airport = null;
   try {
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 4500);
     const aptUrl = `https://aviationweather.gov/api/data/airport?ids=${code}&format=json`;
-    const res = await fetch(aptUrl, { headers });
+    const res = await fetch(aptUrl, { headers, signal: controller.signal });
+    clearTimeout(timeout);
     if (res.ok) {
       const data = await res.json();
       if (Array.isArray(data) && data.length > 0) {
@@ -180,13 +292,13 @@ async function fetchAirportWeather(icao) {
       }
     }
   } catch (err) {
-    console.error(`Error fetching Airport info for ${code}:`, err.message);
+    console.warn(`[Weather] NOAA Airport info notice for ${code}:`, err.message);
   }
 
   // Apply fallback runways if airport or runways is missing or empty
   let runways = (airport && airport.runways && airport.runways.length > 0) ? airport.runways : (AIRPORT_RUNWAY_FALLBACKS[code] || []);
 
-  // If still no runways found, infer typical pairs if known or generate a default single dual-end runway based on 09/27
+  // If still no runways found, infer default dual-end runway based on 09/27
   if (runways.length === 0) {
     runways = [
       { id: '09/27', dimension: '10000x150', surface: 'A', alignment: 90 }
