@@ -11,6 +11,7 @@ const { fetchAirportNotams } = require('./services/notamService');
 const { analyzeAllRunways } = require('./services/windCalculator');
 const { fetchAirportVatsim } = require('./services/vatsimService');
 const { fetchSimBriefOfp } = require('./services/simbriefService');
+const { getAirportDetails } = require('./services/airportDbService');
 const { verifySecurityToken } = require('./utils/security');
 
 const app = express();
@@ -223,6 +224,22 @@ apiRouter.get('/simbrief/:username', async (req, res) => {
     res.json(ofp);
   } catch (err) {
     res.status(400).json({ error: err.message || 'Error fetching SimBrief flight plan' });
+  }
+});
+
+/**
+ * OurAirports Aerodrome Data (Runways, Frequencies, Navaids, Geography)
+ */
+apiRouter.get('/airport/:icao', async (req, res) => {
+  const icao = (req.params.icao || '').toUpperCase().trim();
+  try {
+    const data = await getAirportDetails(icao);
+    if (!data) {
+      return res.status(404).json({ error: `Aerodrome ${icao} not found in database.` });
+    }
+    res.json(data);
+  } catch (err) {
+    res.status(500).json({ error: err.message });
   }
 });
 

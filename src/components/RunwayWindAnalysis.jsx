@@ -225,9 +225,32 @@ export default function RunwayWindAnalysis({ windAnalysis, metar }) {
                   )}
                 </div>
 
-                <div className="text-xs font-mono text-slate-400">
-                  {activeRunway.dimension ? `${activeRunway.dimension} FT` : ''} 
-                  {activeRunway.surface ? ` (${activeRunway.surface === 'A' ? 'Asphalt' : activeRunway.surface === 'C' ? 'Concrete' : 'Pavement'})` : ''}
+                <div className="text-xs font-mono text-slate-400 flex flex-wrap items-center gap-2 mt-0.5">
+                  <span>
+                    {activeRunway.lengthFt ? `${activeRunway.lengthFt} × ${activeRunway.widthFt} FT (${activeRunway.lengthM} × ${activeRunway.widthM} M)` : (activeRunway.dimension ? `${activeRunway.dimension} FT` : '')}
+                  </span>
+                  <span>•</span>
+                  <span className="text-slate-300 font-semibold">
+                    {activeRunway.surfaceLabel || activeRunway.surface || 'Paved'}
+                  </span>
+                  {activeRunway.lighted && (
+                    <>
+                      <span>•</span>
+                      <span className="text-amber-300">💡 Lighted</span>
+                    </>
+                  )}
+                  {activeRunway.displacedThresholdFt > 0 && (
+                    <>
+                      <span>•</span>
+                      <span className="text-purple-300">THR Disp: {activeRunway.displacedThresholdFt} FT</span>
+                    </>
+                  )}
+                  {activeRunway.closed && (
+                    <>
+                      <span>•</span>
+                      <span className="text-rose-400 font-bold bg-rose-500/20 px-1.5 py-0.5 rounded">CLOSED</span>
+                    </>
+                  )}
                 </div>
               </div>
 

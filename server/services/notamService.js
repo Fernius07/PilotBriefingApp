@@ -76,10 +76,26 @@ const AIRPORT_GEO_PRESETS = {
   'CYVR': { lat: 49.1939, lon: -123.1844, elev: 14, runways: ['08L/26R', '08R/26L', '13/31'], fir: 'CZVR' },
 };
 
+const { getAirportDetails } = require('./airportDbService');
+
 /**
- * Resolves aerodrome geographical attributes either from presets or NOAA AWC
+ * Resolves aerodrome geographical attributes from OurAirports dataset
  */
 async function getAirportGeoData(code) {
+  try {
+    const details = await getAirportDetails(code);
+    if (details && details.latitude && details.longitude) {
+      const rwys = (details.runways || []).map(r => r.id);
+      return {
+        lat: details.latitude,
+        lon: details.longitude,
+        elev: details.elevationFt || 500,
+        runways: rwys.length > 0 ? rwys : ['09/27', '18/36'],
+        fir: `${code.slice(0, 2)}XX`
+      };
+    }
+  } catch (_) {}
+
   if (AIRPORT_GEO_PRESETS[code]) {
     return AIRPORT_GEO_PRESETS[code];
   }

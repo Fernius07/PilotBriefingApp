@@ -105,17 +105,25 @@ function analyzeAllRunways(runways = [], metar = {}) {
       const num1 = parseInt(end1.replace(/[^\d]/g, ''), 10) * 10;
       const num2 = parseInt(end2.replace(/[^\d]/g, ''), 10) * 10;
 
-      // Exact alignment if available, else parsed
-      const hdg1 = alignment ? alignment : num1;
-      const hdg2 = alignment ? (alignment + 180) % 360 : num2;
+      // Exact surveyed true heading if available from OurAirports, else alignment, else parsed
+      const hdg1 = rwy.leHeadingDegT || alignment || num1;
+      const hdg2 = rwy.heHeadingDegT || (alignment ? (alignment + 180) % 360 : num2);
 
       runwayEnds.push({
         id: end1,
         oppositeId: end2,
         pairId: rwy.id,
-        heading: hdg1,
+        heading: Math.round(hdg1),
         dimension: rwy.dimension,
+        lengthFt: rwy.lengthFt,
+        lengthM: rwy.lengthM,
+        widthFt: rwy.widthFt,
+        widthM: rwy.widthM,
         surface: rwy.surface,
+        surfaceLabel: rwy.surfaceLabel || rwy.surface,
+        lighted: rwy.lighted,
+        closed: rwy.closed,
+        displacedThresholdFt: rwy.leDisplacedThresholdFt || 0,
         windAnalysis: calculateRunwayWind(hdg1, windDir, windSpeed, windGust),
       });
 
@@ -123,21 +131,37 @@ function analyzeAllRunways(runways = [], metar = {}) {
         id: end2,
         oppositeId: end1,
         pairId: rwy.id,
-        heading: hdg2,
+        heading: Math.round(hdg2),
         dimension: rwy.dimension,
+        lengthFt: rwy.lengthFt,
+        lengthM: rwy.lengthM,
+        widthFt: rwy.widthFt,
+        widthM: rwy.widthM,
         surface: rwy.surface,
+        surfaceLabel: rwy.surfaceLabel || rwy.surface,
+        lighted: rwy.lighted,
+        closed: rwy.closed,
+        displacedThresholdFt: rwy.heDisplacedThresholdFt || 0,
         windAnalysis: calculateRunwayWind(hdg2, windDir, windSpeed, windGust),
       });
     } else {
       // Single identifier
       const end = rwy.id.trim();
-      const hdg = alignment || (parseInt(end.replace(/[^\d]/g, ''), 10) * 10);
+      const hdg = rwy.leHeadingDegT || alignment || (parseInt(end.replace(/[^\d]/g, ''), 10) * 10);
       runwayEnds.push({
         id: end,
         pairId: rwy.id,
-        heading: hdg,
+        heading: Math.round(hdg),
         dimension: rwy.dimension,
+        lengthFt: rwy.lengthFt,
+        lengthM: rwy.lengthM,
+        widthFt: rwy.widthFt,
+        widthM: rwy.widthM,
         surface: rwy.surface,
+        surfaceLabel: rwy.surfaceLabel || rwy.surface,
+        lighted: rwy.lighted,
+        closed: rwy.closed,
+        displacedThresholdFt: rwy.leDisplacedThresholdFt || 0,
         windAnalysis: calculateRunwayWind(hdg, windDir, windSpeed, windGust),
       });
     }

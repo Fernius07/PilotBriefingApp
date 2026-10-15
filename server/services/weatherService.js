@@ -3,8 +3,9 @@ process.env.NODE_TLS_REJECT_UNAUTHORIZED = '0';
 
 /**
  * Real-time Weather Service (NOAA Aviation Weather Center & VATSIM METAR Backup)
- * Provides METAR, TAF, Airport info and calculates Environmental Threats
+ * Enriched with OurAirports Gold Standard Aviation Database
  */
+const { getAirportDetails } = require('./airportDbService');
 
 // Fallback airport runway data for airports where NOAA data/airport might lack complete runway sets
 const AIRPORT_RUNWAY_FALLBACKS = {
@@ -277,61 +278,88 @@ async function fetchAirportWeather(icao) {
     console.warn(`[Weather] NOAA TAF notice for ${code}:`, err.message);
   }
 
-  // 3. Fetch Airport Info & Runways from NOAA AWC
-  let airport = null;
+  // 3. Fetch Comprehensive Airport Info, Runways, Frequencies & Navaids from OurAirports DB
+  let ourAirportsData = null;
   try {
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 4500);
-    const aptUrl = `https://aviationweather.gov/api/data/airport?ids=${code}&format=json`;
-    const res = await fetch(aptUrl, { headers, signal: controller.signal });
-    clearTimeout(timeout);
-    if (res.ok) {
-      const data = await res.json();
-      if (Array.isArray(data) && data.length > 0) {
-        airport = data[0];
-      }
-    }
-  } catch (err) {
-    console.warn(`[Weather] NOAA Airport info notice for ${code}:`, err.message);
+    ourAirportsData = await getAirportDetails(code);
+  } catch (dbErr) {
+    console.warn(`[Weather] Notice querying OurAirports DB for ${code}:`, dbErr.message);
   }
 
-  // Apply fallback runways if airport or runways is missing or empty
-  let runways = (airport && airport.runways && airport.runways.length > 0) ? airport.runways : (AIRPORT_RUNWAY_FALLBACKS[code] || []);
+  // Optional: NOAA Airport query as fallback if not in OurAirports
+  let noaaAirport = null;
+  if (!ourAirportsData) {
+    try {
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 4000);
+      const aptUrl = `https://aviationweather.gov/api/data/airport?ids=${code}&format=json`;
+      const res = await fetch(aptUrl, { headers, signal: controller.signal });
+      clearTimeout(timeout);
+      if (res.ok) {
+        const data = await res.json();
+        if (Array.isArray(data) && data.length > 0) {
+          noaaAirport = data[0];
+        }
+      }
+    } catch (err) {
+      console.warn(`[Weather] NOAA Airport info notice for ${code}:`, err.message);
+    }
+  }
+
+  // Determine effective runways
+  let runways = (ourAirportsData && ourAirportsData.runways && ourAirportsData.runways.length > 0)
+    ? ourAirportsData.runways
+    : ((noaaAirport && noaaAirport.runways && noaaAirport.runways.length > 0) ? noaaAirport.runways : (AIRPORT_RUNWAY_FALLBACKS[code] || []));
 
   // If still no runways found, infer default dual-end runway based on 09/27
   if (runways.length === 0) {
     runways = [
-      { id: '09/27', dimension: '10000x150', surface: 'A', alignment: 90 }
+      { id: '09/27', dimension: '10000x150', surface: 'ASP', surfaceLabel: 'Asphalt', alignment: 90, lengthFt: 10000, widthFt: 150 }
     ];
   }
 
-  // Enrich Airport object
-  const airportData = {
-    icaoId: code,
-    iataId: airport?.iataId || metar?.iataId || '',
-    name: airport?.name || metar?.name || `${code} Aerodrome`,
-    city: airport?.city || airport?.state || '',
-    country: airport?.country || '',
-    elevation: airport?.elev !== undefined ? airport?.elev : (metar?.elev || 0),
-    lat: airport?.lat !== undefined ? airport?.lat : (metar?.lat || 0),
-    lon: airport?.lon !== undefined ? airport?.lon : (metar?.lon || 0),
-    magdec: airport?.magdec || '0E',
-    freqs: airport?.freqs || '',
-    runways: runways,
-  };
+  // Determine effective frequencies
+  let frequencyList = (ourAirportsData && ourAirportsData.frequencyList && ourAirportsData.frequencyList.length > 0)
+    ? ourAirportsData.frequencyList
+    : [];
 
-  // Parse ATC frequencies into structured list
-  const frequencyList = [];
-  if (airportData.freqs) {
-    const parts = airportData.freqs.split(';');
+  if (frequencyList.length === 0 && noaaAirport?.freqs) {
+    const parts = noaaAirport.freqs.split(';');
     for (const p of parts) {
       const [type, freq] = p.split(',');
       if (type && freq) {
-        frequencyList.push({ type: type.trim(), freq: freq.trim() });
+        frequencyList.push({ type: type.trim(), description: type.trim(), freq: `${freq.trim()} MHz` });
       }
     }
   }
-  airportData.frequencyList = frequencyList;
+
+  // Enrich Airport object with complete OurAirports gold standard data
+  const airportData = {
+    icaoId: code,
+    iataId: ourAirportsData?.iataId || noaaAirport?.iataId || metar?.iataId || '',
+    name: ourAirportsData?.name || noaaAirport?.name || metar?.name || `${code} Aerodrome`,
+    city: ourAirportsData?.city || ourAirportsData?.municipality || noaaAirport?.city || noaaAirport?.state || '',
+    municipality: ourAirportsData?.municipality || ourAirportsData?.city || '',
+    country: ourAirportsData?.countryName || noaaAirport?.country || '',
+    countryCode: ourAirportsData?.countryCode || '',
+    region: ourAirportsData?.regionName || noaaAirport?.state || '',
+    regionCode: ourAirportsData?.regionCode || '',
+    type: ourAirportsData?.type || '',
+    typeLabel: ourAirportsData?.typeLabel || 'Civil Aerodrome',
+    elevation: ourAirportsData?.elevationFt !== undefined ? ourAirportsData.elevationFt : (noaaAirport?.elev !== undefined ? noaaAirport?.elev : (metar?.elev || 0)),
+    elevationFt: ourAirportsData?.elevationFt !== undefined ? ourAirportsData.elevationFt : (noaaAirport?.elev !== undefined ? noaaAirport?.elev : (metar?.elev || 0)),
+    elevationM: ourAirportsData?.elevationM || Math.round((noaaAirport?.elev || metar?.elev || 0) * 0.3048),
+    lat: ourAirportsData?.latitude !== undefined ? ourAirportsData.latitude : (noaaAirport?.lat !== undefined ? noaaAirport?.lat : (metar?.lat || 0)),
+    lon: ourAirportsData?.longitude !== undefined ? ourAirportsData.longitude : (noaaAirport?.lon !== undefined ? noaaAirport?.lon : (metar?.lon || 0)),
+    magdec: ourAirportsData?.runways?.[0]?.magneticVariation ? `${ourAirportsData.runways[0].magneticVariation}°` : (noaaAirport?.magdec || '0E'),
+    wikipediaLink: ourAirportsData?.wikipediaLink || '',
+    homeLink: ourAirportsData?.homeLink || '',
+    runways: runways,
+    frequencyList: frequencyList,
+    frequencies: frequencyList,
+    navaids: ourAirportsData?.navaids || [],
+    dataSource: ourAirportsData ? 'OurAirports Aviation Database' : 'NOAA AWC'
+  };
 
   // Flight category determination (VFR, MVFR, IFR, LIFR)
   const fltCat = metar?.fltCat || 'VFR';

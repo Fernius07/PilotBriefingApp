@@ -2,7 +2,8 @@ import React, { useState } from 'react';
 import { 
   Cloud, Wind, Thermometer, Gauge, Eye, EyeOff, 
   AlertTriangle, Copy, Check, Clock, ShieldAlert,
-  Zap, Snowflake, Compass, Layers, ArrowUpRight
+  Zap, Snowflake, Compass, Layers, ArrowUpRight,
+  ExternalLink, Radio, Navigation, ChevronDown, ChevronUp
 } from 'lucide-react';
 import { 
   getFlightCategoryBadge, 
@@ -17,6 +18,8 @@ export default function WeatherCard({ weather, windAnalysis }) {
   const [copiedMetar, setCopiedMetar] = useState(false);
   const [copiedTaf, setCopiedTaf] = useState(false);
   const [showRawTaf, setShowRawTaf] = useState(false);
+  const [showAllFrequencies, setShowAllFrequencies] = useState(false);
+  const [copiedFreq, setCopiedFreq] = useState(null);
 
   if (!weather) {
     return (
@@ -45,6 +48,13 @@ export default function WeatherCard({ weather, windAnalysis }) {
     }
   };
 
+  const handleCopyFreq = (freqStr) => {
+    const clean = String(freqStr).replace(/[^\d.]/g, '');
+    copyToClipboard(clean || freqStr);
+    setCopiedFreq(freqStr);
+    setTimeout(() => setCopiedFreq(null), 2000);
+  };
+
   const densityAlt = metar ? calculateDensityAltitude(metar.altim, metar.temp, airport?.elevation || 0) : null;
   const tempSpread = (metar && metar.temp !== undefined && metar.dewp !== undefined) 
     ? (metar.temp - metar.dewp).toFixed(1) 
@@ -54,15 +64,21 @@ export default function WeatherCard({ weather, windAnalysis }) {
     <div className="space-y-4">
       {/* Airport Header Card */}
       <div className="bg-cockpit-900 border border-cockpit-border rounded-xl p-5 shadow-lg">
-        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4">
+        <div className="flex flex-col lg:flex-row items-start lg:items-center justify-between gap-4">
           <div>
-            <div className="flex items-center gap-3">
+            <div className="flex flex-wrap items-center gap-3">
               <span className="text-2xl font-bold font-mono tracking-wider text-white">
                 {airport?.icaoId || weather.icao}
               </span>
               {airport?.iataId && (
                 <span className="px-2 py-0.5 rounded bg-cockpit-800 border border-cockpit-border text-slate-300 font-mono text-sm font-semibold">
                   {airport.iataId}
+                </span>
+              )}
+              {/* Airport Type Tag from OurAirports */}
+              {airport?.typeLabel && (
+                <span className="px-2 py-0.5 rounded bg-cockpit-950 border border-cockpit-border text-slate-300 font-mono text-xs">
+                  {airport.typeLabel}
                 </span>
               )}
               {/* Flight Category Pill */}
@@ -73,32 +89,116 @@ export default function WeatherCard({ weather, windAnalysis }) {
               </div>
             </div>
 
-            <h1 className="text-base font-medium text-slate-200 mt-1">
-              {airport?.name || 'Aerodrome'}
-            </h1>
-            <div className="flex flex-wrap items-center gap-3 text-xs font-mono text-slate-400 mt-1.5">
-              <span>ELEV: <strong className="text-slate-200">{airport?.elevation || 0} FT</strong></span>
+            <div className="flex flex-wrap items-center gap-2 mt-1">
+              <h1 className="text-base font-bold text-slate-100">
+                {airport?.name || 'Aerodrome'}
+              </h1>
+              {(airport?.city || airport?.municipality || airport?.country) && (
+                <span className="text-xs font-mono text-slate-400">
+                  • {airport?.municipality || airport?.city}{airport?.region ? `, ${airport?.region}` : ''}{airport?.country ? ` (${airport?.country})` : ''}
+                </span>
+              )}
+            </div>
+
+            <div className="flex flex-wrap items-center gap-3 text-xs font-mono text-slate-400 mt-2">
+              <span>ELEV: <strong className="text-slate-200">{airport?.elevation || airport?.elevationFt || 0} FT {airport?.elevationM ? `(${airport.elevationM} M)` : ''}</strong></span>
               <span>•</span>
-              <span>COORD: <strong className="text-slate-200">{airport?.lat?.toFixed(3)}°, {airport?.lon?.toFixed(3)}°</strong></span>
+              <span>COORD: <strong className="text-slate-200">{airport?.lat?.toFixed(4)}°, {airport?.lon?.toFixed(4)}°</strong></span>
               <span>•</span>
               <span>MAG VAR: <strong className="text-slate-200">{airport?.magdec || '0°'}</strong></span>
+              {airport?.wikipediaLink && (
+                <>
+                  <span>•</span>
+                  <a 
+                    href={airport.wikipediaLink} 
+                    target="_blank" 
+                    rel="noreferrer" 
+                    className="text-cockpit-cyan hover:underline flex items-center gap-1"
+                  >
+                    <span>Wikipedia</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                </>
+              )}
+              {airport?.homeLink && (
+                <>
+                  <span>•</span>
+                  <a 
+                    href={airport.homeLink} 
+                    target="_blank" 
+                    rel="noreferrer" 
+                    className="text-cockpit-cyan hover:underline flex items-center gap-1"
+                  >
+                    <span>Official Web</span>
+                    <ExternalLink className="w-3 h-3" />
+                  </a>
+                </>
+              )}
             </div>
           </div>
 
-          {/* ATC Frequencies pill list */}
+          {/* ATC Frequencies interactive panel */}
           {airport?.frequencyList && airport.frequencyList.length > 0 && (
-            <div className="flex flex-wrap sm:flex-col gap-1.5 text-xs font-mono bg-cockpit-950 p-2.5 rounded-lg border border-cockpit-border max-w-xs">
-              <span className="text-[10px] text-slate-500 uppercase font-bold tracking-wider">OFFICIAL FREQUENCIES</span>
-              <div className="flex flex-wrap gap-2">
-                {airport.frequencyList.slice(0, 4).map((f, i) => (
-                  <span key={i} className="text-slate-300">
-                    <span className="text-cockpit-cyan font-bold">{f.type}:</span> {f.freq}
-                  </span>
+            <div className="flex flex-col gap-1.5 text-xs font-mono bg-cockpit-950 p-3 rounded-lg border border-cockpit-border w-full lg:max-w-md">
+              <div className="flex items-center justify-between">
+                <span className="text-[10px] text-slate-400 uppercase font-bold tracking-wider flex items-center gap-1.5">
+                  <Radio className="w-3.5 h-3.5 text-cockpit-cyan" />
+                  OFFICIAL ATC FREQUENCIES ({airport.frequencyList.length})
+                </span>
+                {airport.frequencyList.length > 4 && (
+                  <button 
+                    onClick={() => setShowAllFrequencies(!showAllFrequencies)}
+                    className="text-[10px] text-cockpit-cyan hover:underline flex items-center gap-0.5"
+                  >
+                    <span>{showAllFrequencies ? 'Show Less' : `+${airport.frequencyList.length - 4} More`}</span>
+                    {showAllFrequencies ? <ChevronUp className="w-3 h-3" /> : <ChevronDown className="w-3 h-3" />}
+                  </button>
+                )}
+              </div>
+              <div className="grid grid-cols-2 sm:grid-cols-2 gap-2 mt-1">
+                {(showAllFrequencies ? airport.frequencyList : airport.frequencyList.slice(0, 4)).map((f, i) => (
+                  <button
+                    key={i}
+                    onClick={() => handleCopyFreq(f.mhz || f.freq)}
+                    className="flex items-center justify-between p-1.5 rounded bg-cockpit-900 hover:bg-cockpit-850 border border-cockpit-border/70 text-left transition-colors group"
+                    title={`Click to copy ${f.description || f.type} frequency (${f.freq})`}
+                  >
+                    <span className="truncate pr-1 text-slate-300">
+                      <span className="text-cockpit-cyan font-bold">{f.type}:</span> {f.description && f.description !== f.type ? f.description : ''}
+                    </span>
+                    <span className="text-slate-100 font-bold flex-shrink-0 flex items-center gap-1">
+                      {f.freq}
+                      {copiedFreq === (f.mhz || f.freq) ? <Check className="w-3 h-3 text-emerald-400" /> : <Copy className="w-2.5 h-2.5 opacity-0 group-hover:opacity-100 text-slate-400" />}
+                    </span>
+                  </button>
                 ))}
               </div>
             </div>
           )}
         </div>
+
+        {/* Radio Navigation Aids (Navaids) Bar if available from OurAirports */}
+        {airport?.navaids && airport.navaids.length > 0 && (
+          <div className="mt-3 pt-3 border-t border-cockpit-border/60 flex flex-wrap items-center gap-2 text-xs font-mono">
+            <span className="text-[10px] text-slate-500 uppercase font-bold tracking-wider flex items-center gap-1">
+              <Navigation className="w-3 h-3 text-amber-400" />
+              ASSOCIATED RADIO NAVAIDS:
+            </span>
+            <div className="flex flex-wrap gap-2">
+              {airport.navaids.map((nav, idx) => (
+                <div 
+                  key={idx} 
+                  className="px-2 py-0.5 rounded bg-cockpit-950 border border-cockpit-border text-slate-300 flex items-center gap-1.5"
+                  title={`${nav.name} (${nav.type}) • ${nav.frequencyFormatted} ${nav.channel ? `• CH ${nav.channel}` : ''}`}
+                >
+                  <span className="text-amber-400 font-bold">{nav.ident}</span>
+                  <span className="text-[10px] px-1 rounded bg-cockpit-850 text-slate-400">{nav.type}</span>
+                  <span className="font-semibold text-slate-200">{nav.frequencyFormatted}</span>
+                </div>
+              ))}
+            </div>
+          </div>
+        )}
 
         {/* Environmental Threat Alerts (If active) */}
         {environmentalThreats && environmentalThreats.length > 0 && (
